@@ -196,6 +196,82 @@
       flex: 1;
       background: var(--canvas-bg);
       min-height: calc(100vh - 52px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+    }
+
+    .home-launchpad {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .home-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 40px 36px;
+      text-align: center;
+    }
+
+    .home-card-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 20px;
+      background: var(--teal-light);
+      color: var(--teal);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .home-card-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+
+    .home-card-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0 0 24px;
+    }
+
+    .home-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+      padding: 12px 16px;
+      background: var(--info-banner);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .home-step-sep {
+      color: var(--muted);
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    .home-cta {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 10px 16px;
+      font-size: 14px;
+    }
+
+    .home-reset {
+      font-size: 12px;
     }
 
     /* ========== Modal ========== */
@@ -1035,6 +1111,12 @@
         { id: "path", icon: "fa-layer-group", title: "Learning Path", desc: "Create a learning path and add a set of learning activities for learners to complete" },
         { id: "rubric", icon: "fa-clipboard-check", title: "Rubric", desc: "Create a rubric for learners to reference and to be used to score lesson submissions" },
       ],
+      home: {
+        title: "Consolidated Event Creation",
+        desc: "Create an event, sessions, and essential configuration in one guided flow.",
+        cta: "Create Event",
+        reset: "Reset demo",
+      },
       configLabels: {
         learningPaths: "Add Event to Learning Paths",
         enrollment: "Manage Event Enrollment",
@@ -1320,6 +1402,31 @@
               <button type="button" title="Content"><i class="fa-solid fa-layer-group"></i></button>
             </nav>
             ${content}
+          </div>
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Home Launchpad ====
+    function renderHomePage() {
+      const steps = STRINGS.steps.map((label, i) => {
+        const sep = i < STRINGS.steps.length - 1
+          ? '<span class="home-step-sep"><i class="fa-solid fa-chevron-right"></i></span>'
+          : "";
+        return `<span class="home-step">${escapeHtml(label)}</span>${sep}`;
+      }).join("");
+
+      return `
+        <div class="main-bg">
+          <div class="home-launchpad">
+            <div class="home-card">
+              <div class="home-card-icon" aria-hidden="true"><i class="fa-solid fa-calendar-plus"></i></div>
+              <h1 class="home-card-title">${STRINGS.home.title}</h1>
+              <p class="home-card-desc">${STRINGS.home.desc}</p>
+              <div class="home-steps" aria-label="Wizard steps">${steps}</div>
+              <button type="button" class="btn btn-primary home-cta" data-action="open-event-wizard">${STRINGS.home.cta}</button>
+              <button type="button" class="link-action home-reset" data-action="reset-demo">${STRINGS.home.reset}</button>
+            </div>
           </div>
         </div>
       `;
@@ -1893,7 +2000,7 @@
       const isOverview = state.created || state.route === "overview" || location.hash === "#overview";
       const content = isOverview
         ? renderEventPage()
-        : `<div class="main-bg"></div>`;
+        : renderHomePage();
 
       let modal = "";
       if (state.modal === "learning") modal = renderNewLearningModal();
@@ -1968,7 +2075,23 @@
         case "open-learning":
           state.modal = "learning";
           state.selectedLearningType = "event";
+          saveState(state);
           navigate("#new-learning");
+          break;
+
+        case "open-event-wizard":
+          state.modal = "wizard";
+          state.wizardStep = 1;
+          state.selectedLearningType = "event";
+          state.showValidation = false;
+          saveState(state);
+          navigate("#create/1");
+          break;
+
+        case "reset-demo":
+          localStorage.removeItem(STORAGE_KEY);
+          state = getDefaultState();
+          navigate("#home");
           break;
 
         case "close-modal":
