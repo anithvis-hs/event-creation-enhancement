@@ -1,6 +1,6 @@
 # Consolidated Event Creation
 
-Highspot prototype for Humana / Event-Based Learning. Create an event, sessions, and essential configuration in one guided flow.
+Prototype for consolidated event creation. Create an event, sessions, and essential configuration in one guided flow.
 
 ## Links
 
@@ -39,7 +39,7 @@ flowchart LR
 
 - Guided event + sessions + essential configuration flow
 - Virtual session setup with Zoom / Teams / Meet integration UI
-- Local state persistence via `localStorage` (`hs-event-create-v1`)
+- Local state persistence via `localStorage`
 
 ## Out of scope
 
