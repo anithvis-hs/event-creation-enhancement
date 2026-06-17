@@ -421,6 +421,17 @@
 
     .form-textarea { min-height: 80px; resize: vertical; }
 
+    .banner-upload-placeholder {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 32px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      background: #fafbfc;
+      margin-bottom: 10px;
+    }
+
     .hint-row {
       display: flex;
       justify-content: flex-end;
@@ -459,6 +470,40 @@
       padding: 0;
       font-size: 14px;
       line-height: 1;
+    }
+
+    .chip-input {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      min-height: 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      background: #fff;
+      cursor: text;
+    }
+
+    .chip-input:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0,115,187,0.15);
+    }
+
+    .chip-input input {
+      flex: 1;
+      min-width: 120px;
+      border: none;
+      outline: none;
+      padding: 4px 0;
+      font-family: inherit;
+      font-size: 13px;
+      background: transparent;
+    }
+
+    .chip-input input::placeholder {
+      color: var(--muted);
     }
 
     .form-row { display: flex; gap: 16px; }
@@ -1046,9 +1091,11 @@
         event: {
           title: "",
           description: "",
-          spot: "Test Design Spot",
+          spot: "",
+          bannerImage: null,
           contact: "David Davidson",
           contactEmail: "david.davidson@highspot.com",
+          sessionInstructors: ["David Davidson"],
         },
         sessions: [],
         editingSessionId: null,
@@ -1100,6 +1147,12 @@
         description: "",
         date: addDaysToDateString(savedSession.date, 1),
       };
+    }
+
+    function syncSessionFormInstructorsFromEvent() {
+      if (state.sessions.length === 0 && !state.editingSessionId && state.event.sessionInstructors?.length) {
+        state.sessionForm.instructors = [...state.event.sessionInstructors];
+      }
     }
 
     function getState() {
@@ -1168,6 +1221,21 @@
       return d.innerHTML;
     }
 
+    function renderChipInput(chips, { ariaLabel, removeAction }) {
+      const chipHtml = chips.map((name, i) => `
+        <span class="chip-tag">
+          ${escapeHtml(name)}
+          <button type="button" class="remove" data-action="${removeAction}" data-index="${i}" aria-label="Remove ${escapeHtml(name)}">&times;</button>
+        </span>
+      `).join("");
+      return `
+        <div class="chip-input" role="combobox" aria-label="${escapeHtml(ariaLabel)}">
+          ${chipHtml}
+          <input type="text"${chips.length ? "" : ' placeholder="Search people…"'} />
+        </div>
+      `;
+    }
+
     function formatDate(dateStr) {
       if (!dateStr) return "";
       const d = new Date(dateStr + "T12:00:00");
@@ -1218,7 +1286,7 @@
     }
 
     function eventStepValid() {
-      return state.event.title.trim().length > 0;
+      return state.event.title.trim().length > 0 && state.event.spot.trim().length > 0;
     }
 
     function sessionsStepValid() {
@@ -1316,8 +1384,8 @@
         <div class="wizard-content">
           <div class="form-group">
             <label class="form-label">Title <span class="req">*</span></label>
-            <input class="form-input" type="text" data-field="event.title" value="${escapeHtml(state.event.title)}" placeholder="Enter event title" />
-            ${state.showValidation && !eventStepValid() ? '<div class="validation-msg">Title is required</div>' : ""}
+            <input class="form-input" type="text" data-field="event.title" value="${escapeHtml(state.event.title)}" />
+            ${state.showValidation && !state.event.title.trim() ? '<div class="validation-msg">Title is required</div>' : ""}
           </div>
           <div class="form-group">
             <label class="form-label">Description</label>
@@ -1325,20 +1393,41 @@
               <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
               <button type="button" class="text-link">Text Preview</button>
             </div>
-            <textarea class="form-textarea" data-field="event.description" placeholder="Describe the event for learners…">${escapeHtml(state.event.description)}</textarea>
+            <textarea class="form-textarea" data-field="event.description">${escapeHtml(state.event.description)}</textarea>
           </div>
           <div class="form-group">
-            <label class="form-label">Destination Spot <span class="req">*</span></label>
+            <label class="form-label">Spot <span class="req">*</span></label>
             <select class="form-select" data-field="event.spot">
-              ${SPOTS.map((s) => `<option ${state.event.spot === s ? "selected" : ""}>${escapeHtml(s)}</option>`).join("")}
+              <option value="" ${!state.event.spot ? "selected" : ""}>Select a spot</option>
+              ${SPOTS.map((s) => `<option value="${escapeHtml(s)}" ${state.event.spot === s ? "selected" : ""}>${escapeHtml(s)}</option>`).join("")}
             </select>
+            ${state.showValidation && state.event.title.trim() && !state.event.spot ? '<div class="validation-msg">Spot is required</div>' : ""}
+          </div>
+          <div class="info-banner">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>${STRINGS.infoBannerRegAttendance}</span>
+          </div>
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.regAttendance} <span class="req">*</span> <i class="fa-regular fa-circle-question"></i></div>
+            <div class="radio-group">
+              ${renderConfigRadios("regAttendance", "regAttendance", [
+                { value: "single", label: "Register for a single session and attend that session" },
+                { value: "all-all", label: "Register for all sessions and attend all sessions" },
+                { value: "all-one", label: "Register for all sessions and attend at least one session" },
+              ])}
+            </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Event Contact</label>
-            <div class="chip-tag">
-              ${escapeHtml(state.event.contact)}
-              <button type="button" class="remove" aria-label="Remove">&times;</button>
-            </div>
+            <label class="form-label">Event Banner Image</label>
+            <div class="banner-upload-placeholder">${state.event.bannerImage ? escapeHtml(state.event.bannerImage) : "No Image Uploaded"}</div>
+            <button type="button" class="btn" data-action="upload-banner">Upload Image</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Session Instructors</label>
+            ${renderChipInput(state.event.sessionInstructors || [], {
+              ariaLabel: "Session Instructors",
+              removeAction: "remove-event-instructor",
+            })}
           </div>
         </div>
       `;
@@ -1436,15 +1525,12 @@
     function renderSessionForm() {
       const f = state.sessionForm;
       const isEdit = state.editingSessionId !== null;
-      const titlePlaceholder = !isEdit && state.sessions.length > 0
-        ? `Session ${state.sessions.length + 1}`
-        : "";
       return `
         <div class="session-form-panel" id="session-form-panel">
           <h4><i class="fa-solid fa-${isEdit ? "pen" : "plus"}"></i> ${isEdit ? "Edit Session" : "Add Session"}</h4>
           <div class="form-group">
             <label class="form-label">Title <span class="req">*</span></label>
-            <input class="form-input" type="text" data-field="sessionForm.title" value="${escapeHtml(f.title)}" placeholder="${escapeHtml(titlePlaceholder)}" />
+            <input class="form-input" type="text" data-field="sessionForm.title" value="${escapeHtml(f.title)}" />
           </div>
           <div class="form-group">
             <label class="form-label">Description</label>
@@ -1452,14 +1538,11 @@
               <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
               <button type="button" class="text-link">Text Preview</button>
             </div>
-            <textarea class="form-textarea" data-field="sessionForm.description" placeholder="Enter a description for the session">${escapeHtml(f.description)}</textarea>
+            <textarea class="form-textarea" data-field="sessionForm.description">${escapeHtml(f.description)}</textarea>
           </div>
           <div class="form-group">
             <label class="form-label">Instructors <span class="req">*</span></label>
-            <div class="chip-tag">
-              ${f.instructors.map((i) => escapeHtml(i)).join(", ")}
-              <button type="button" class="remove">&times;</button>
-            </div>
+            ${renderChipInput(f.instructors, { ariaLabel: "Instructors", removeAction: "remove-instructor" })}
           </div>
           <div class="form-group">
             <label class="form-label">Timezone</label>
@@ -1602,22 +1685,6 @@
             </div>
           </div>
 
-          <div class="info-banner">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>${STRINGS.infoBannerRegAttendance}</span>
-          </div>
-
-          <div class="config-section">
-            <div class="config-section-title">${STRINGS.configLabels.regAttendance} <i class="fa-regular fa-circle-question"></i></div>
-            <div class="radio-group">
-              ${renderConfigRadios("regAttendance", "regAttendance", [
-                { value: "single", label: "Register for a single session and attend that session" },
-                { value: "all-all", label: "Register for all sessions and attend all sessions" },
-                { value: "all-one", label: "Register for all sessions and attend at least one session" },
-              ])}
-            </div>
-          </div>
-
           <div class="config-section">
             <div class="config-section-title">${STRINGS.configLabels.autoAttendance} <i class="fa-regular fa-circle-question"></i></div>
             <div class="radio-group">
@@ -1721,7 +1788,8 @@
 
       return `
         <div class="overview-content">
-          <div class="event-banner">
+          <div class="event-banner"${state.event.bannerImage ? ` style="background:#e8f4fc;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px"` : ""}>
+            ${state.event.bannerImage ? escapeHtml(state.event.bannerImage) : ""}
             <button type="button" class="edit-img" aria-label="Edit image"><i class="fa-regular fa-image"></i></button>
           </div>
           <div class="overview-title-block">
@@ -1946,6 +2014,7 @@
           state.showValidation = false;
           if (state.wizardStep < 3) {
             state.wizardStep++;
+            if (state.wizardStep === 2) syncSessionFormInstructorsFromEvent();
             navigate("#create/" + state.wizardStep);
           }
           break;
@@ -1954,6 +2023,7 @@
           state.modal = "wizard";
           state.wizardStep = 2;
           state.showValidation = false;
+          syncSessionFormInstructorsFromEvent();
           navigate("#create/2");
           break;
 
@@ -1969,6 +2039,30 @@
           state.activeTab = "overview";
           navigate("#overview");
           break;
+
+        case "upload-banner":
+          state.event.bannerImage = "event-banner.jpg";
+          saveState(state);
+          render();
+          break;
+
+        case "remove-event-instructor": {
+          const index = parseInt(el.getAttribute("data-index"), 10);
+          state.event.sessionInstructors = (state.event.sessionInstructors || []).filter((_, i) => i !== index);
+          saveState(state);
+          render();
+          break;
+        }
+
+        case "remove-instructor": {
+          const index = parseInt(el.getAttribute("data-index"), 10);
+          if (state.sessionForm.instructors.length <= 1) return;
+          state.sessionForm.instructors = state.sessionForm.instructors.filter((_, i) => i !== index);
+          saveState(state);
+          render();
+          updateWizardButtons();
+          break;
+        }
 
         case "save-session": {
           const f = { ...state.sessionForm, id: state.editingSessionId || "s-" + Date.now() };
