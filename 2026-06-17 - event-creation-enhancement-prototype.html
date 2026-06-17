@@ -33,6 +33,7 @@
       --sidebar-bg: #f0f3f6;
       --info-banner: #e8f4fc;
       --danger: #c62828;
+      --success: #2e7d32;
       --shadow: 0 12px 40px rgba(12, 35, 64, 0.18);
       --radius: 8px;
       --radius-sm: 4px;
@@ -297,7 +298,11 @@
     }
 
     .modal--learning { width: min(640px, 96vw); max-height: min(88vh, 720px); }
-    .modal--wizard { width: min(920px, 96vw); max-height: min(92vh, 860px); }
+    .modal--wizard {
+      width: min(920px, 96vw);
+      max-height: min(92vh, 860px);
+      min-height: min(520px, 80vh);
+    }
 
     .modal-header {
       background: var(--primary);
@@ -327,6 +332,33 @@
       border-radius: 4px;
     }
     .modal-close:hover { background: rgba(255,255,255,0.15); }
+
+    .modal-header--wizard {
+      background: #fff;
+      color: var(--text);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header--wizard .modal-header-title {
+      margin: 0;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .modal-close--neutral {
+      width: 28px;
+      height: 28px;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-size: 14px;
+    }
+    .modal-close--neutral:hover { background: #f8f9fb; }
 
     .modal-body {
       flex: 1;
@@ -416,53 +448,121 @@
     }
 
     /* ========== Wizard ========== */
-    .wizard-progress {
+    .wizard-body {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 24px;
-      border-bottom: 1px solid var(--border);
-      background: #fafbfc;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .wizard-sidebar {
+      width: 230px;
       flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      background: #fff;
+      padding: 20px 0;
     }
 
-    .progress-step {
+    .wizard-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 400px;
+    }
+
+    .wizard-main .modal-body {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .wizard-stepper {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .wizard-stepper::before {
+      content: "";
+      position: absolute;
+      left: 31px;
+      top: 25px;
+      bottom: 25px;
+      width: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+
+    .stepper-step {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 500;
+      gap: 12px;
+      padding: 10px 16px;
+      margin: 0 0 4px;
+      position: relative;
+      z-index: 1;
     }
 
-    .progress-step.active { color: var(--primary); font-weight: 700; }
-    .progress-step.done { color: var(--teal); }
+    .stepper-step:last-child {
+      margin-bottom: 0;
+    }
 
-    .progress-step-num {
-      width: 24px;
-      height: 24px;
+    .stepper-step.active {
+      background: var(--teal-light);
+      border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+
+    .stepper-step.active::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--teal);
+    }
+
+    .stepper-step__indicator {
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      border: 2px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
+      flex-shrink: 0;
+      background: #fff;
+      border: 2px solid var(--border);
+      color: var(--muted);
     }
 
-    .progress-step.active .progress-step-num {
-      border-color: var(--primary);
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .progress-step.done .progress-step-num {
-      border-color: var(--teal);
+    .stepper-step.active .stepper-step__indicator {
       background: var(--teal);
+      border-color: var(--teal);
       color: #fff;
     }
 
-    .progress-sep { color: var(--border); font-size: 10px; }
+    .stepper-step.complete .stepper-step__indicator {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+      font-size: 11px;
+    }
+
+    .stepper-step__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .stepper-step.active .stepper-step__label {
+      font-weight: 600;
+    }
+
+    .stepper-step.upcoming .stepper-step__label {
+      color: var(--muted);
+    }
 
     .wizard-content { padding: 24px; }
 
@@ -506,6 +606,23 @@
       font-size: 13px;
       background: #fafbfc;
       margin-bottom: 10px;
+    }
+
+    .form-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .form-label-row .form-label {
+      margin-bottom: 0;
+    }
+
+    .form-label-row .hint-row {
+      margin-bottom: 0;
+      flex-shrink: 0;
     }
 
     .hint-row {
@@ -1169,7 +1286,7 @@
         modal: null,
         wizardStep: 1,
         selectedLearningType: "event",
-        bannerDismissed: { sessions: false, overview: false },
+        bannerDismissed: { overview: false },
         event: {
           title: "",
           description: "",
@@ -1194,7 +1311,21 @@
         created: false,
         activeTab: "overview",
         showValidation: false,
+        wizardBackdrop: "home",
       };
+    }
+
+    function resetForNewEvent() {
+      const defaults = getDefaultState();
+      state.event = { ...defaults.event };
+      state.sessions = [];
+      state.sessionForm = emptySessionForm();
+      state.config = { ...defaults.config };
+      state.integrations = defaultIntegrations();
+      state.editingSessionId = null;
+      state.showValidation = false;
+      state.created = false;
+      state.wizardStep = 1;
     }
 
     function emptySessionForm() {
@@ -1272,7 +1403,7 @@
       const createMatch = hash.match(/^create\/(\d)$/);
       if (createMatch) {
         return {
-          route: state.created ? "overview" : "home",
+          route: state.wizardBackdrop === "overview" ? "overview" : "home",
           modal: "wizard",
           wizardStep: parseInt(createMatch[1], 10),
         };
@@ -1469,20 +1600,29 @@
       `;
     }
 
-    // ==== RENDER: Wizard Progress ====
-    function renderProgress() {
-      return STRINGS.steps.map((label, i) => {
+    // ==== RENDER: Wizard Side Stepper ====
+    function renderSideStepper() {
+      const steps = STRINGS.steps.map((label, i) => {
         const step = i + 1;
-        const cls = step === state.wizardStep ? "active" : step < state.wizardStep ? "done" : "";
-        const icon = step < state.wizardStep ? '<i class="fa-solid fa-check"></i>' : step;
-        const sep = i < STRINGS.steps.length - 1 ? '<span class="progress-sep"><i class="fa-solid fa-chevron-right"></i></span>' : "";
+        const cls = step === state.wizardStep ? "active"
+          : step < state.wizardStep ? "complete" : "upcoming";
+        const indicator = step < state.wizardStep
+          ? '<i class="fa-solid fa-check" aria-hidden="true"></i>'
+          : step;
+        const ariaCurrent = step === state.wizardStep ? ' aria-current="step"' : "";
         return `
-          <div class="progress-step ${cls}">
-            <span class="progress-step-num">${icon}</span>
-            ${label}
-          </div>${sep}
+          <li class="stepper-step ${cls}"${ariaCurrent}>
+            <span class="stepper-step__indicator">${indicator}</span>
+            <span class="stepper-step__label">${escapeHtml(label)}</span>
+          </li>
         `;
       }).join("");
+
+      return `
+        <nav class="wizard-sidebar" aria-label="Create event steps">
+          <ol class="wizard-stepper">${steps}</ol>
+        </nav>
+      `;
     }
 
     // ==== RENDER: Wizard Step 1 ====
@@ -1495,10 +1635,12 @@
             ${state.showValidation && !state.event.title.trim() ? '<div class="validation-msg">Title is required</div>' : ""}
           </div>
           <div class="form-group">
-            <label class="form-label">Description</label>
-            <div class="hint-row">
-              <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
-              <button type="button" class="text-link">Text Preview</button>
+            <div class="form-label-row">
+              <label class="form-label">Description</label>
+              <div class="hint-row">
+                <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
+                <button type="button" class="text-link">Text Preview</button>
+              </div>
             </div>
             <textarea class="form-textarea" data-field="event.description">${escapeHtml(state.event.description)}</textarea>
           </div>
@@ -1640,10 +1782,12 @@
             <input class="form-input" type="text" data-field="sessionForm.title" value="${escapeHtml(f.title)}" />
           </div>
           <div class="form-group">
-            <label class="form-label">Description</label>
-            <div class="hint-row">
-              <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
-              <button type="button" class="text-link">Text Preview</button>
+            <div class="form-label-row">
+              <label class="form-label">Description</label>
+              <div class="hint-row">
+                <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
+                <button type="button" class="text-link">Text Preview</button>
+              </div>
             </div>
             <textarea class="form-textarea" data-field="sessionForm.description">${escapeHtml(f.description)}</textarea>
           </div>
@@ -1713,14 +1857,6 @@
 
     // ==== RENDER: Wizard Step 2 ====
     function renderStep2() {
-      const banner = !state.bannerDismissed.sessions ? `
-        <div class="info-banner" id="sessions-banner">
-          <i class="fa-solid fa-circle-info"></i>
-          <span>${STRINGS.infoBannerSession}</span>
-          <button type="button" class="dismiss" data-action="dismiss-banner" data-target="sessions"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-      ` : "";
-
       const cards = state.sessions.length
         ? `<div class="session-cards">${state.sessions.map(renderSessionCard).join("")}</div>`
         : "";
@@ -1738,7 +1874,6 @@
           <div class="sessions-header">
             <h3>Sessions</h3>
           </div>
-          ${banner}
           ${cards}
           ${renderSessionForm()}
           ${state.sessions.length > 0 && !state.editingSessionId ? addAnotherBtn : ""}
@@ -1832,17 +1967,18 @@
       return `
         <div class="overlay" role="dialog" aria-modal="true">
           <div class="modal modal--wizard">
-            <div class="modal-header">
-              <div class="modal-header-title">
-                <i class="fa-regular fa-calendar-plus"></i>
-                Create Event
-              </div>
-              <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">
+            <div class="modal-header modal-header--wizard">
+              <h2 class="modal-header-title">${STRINGS.createEvent}</h2>
+              <button type="button" class="modal-close modal-close--neutral" data-action="close-modal" aria-label="Close">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
-            <div class="wizard-progress">${renderProgress()}</div>
-            <div class="modal-body">${stepContent}</div>
+            <div class="wizard-body">
+              ${renderSideStepper()}
+              <div class="wizard-main">
+                <div class="modal-body">${stepContent}</div>
+              </div>
+            </div>
             <div class="modal-footer">
               <button type="button" class="btn" data-action="wizard-back" ${backDisabled ? "disabled" : ""}>Back</button>
               <div class="footer-right">
@@ -1961,7 +2097,7 @@
             <div class="event-header-left">
               <div class="event-title-row">
                 <button type="button" class="icon-btn" style="color:var(--text);width:28px;height:28px;border:1px solid var(--border)"><i class="fa-solid fa-arrow-left"></i></button>
-                <button type="button" class="icon-btn" style="color:var(--text);width:28px;height:28px;border:1px solid var(--border)"><i class="fa-solid fa-house"></i></button>
+                <button type="button" class="icon-btn" style="color:var(--text);width:28px;height:28px;border:1px solid var(--border)" data-action="go-home" aria-label="Home" title="Home"><i class="fa-solid fa-house"></i></button>
                 <h1>${escapeHtml(state.event.title)}</h1>
               </div>
               <div class="event-meta">
@@ -1997,7 +2133,7 @@
 
     // ==== RENDER: Main ====
     function render() {
-      const isOverview = state.created || state.route === "overview" || location.hash === "#overview";
+      const isOverview = state.route === "overview" || location.hash === "#overview";
       const content = isOverview
         ? renderEventPage()
         : renderHomePage();
@@ -2072,6 +2208,12 @@
       e.preventDefault();
 
       switch (action) {
+        case "go-home":
+          state.modal = null;
+          saveState(state);
+          navigate("#home");
+          break;
+
         case "open-learning":
           state.modal = "learning";
           state.selectedLearningType = "event";
@@ -2080,10 +2222,10 @@
           break;
 
         case "open-event-wizard":
+          resetForNewEvent();
           state.modal = "wizard";
-          state.wizardStep = 1;
           state.selectedLearningType = "event";
-          state.showValidation = false;
+          state.wizardBackdrop = "home";
           saveState(state);
           navigate("#create/1");
           break;
@@ -2109,8 +2251,10 @@
 
         case "learning-next":
           if (state.selectedLearningType !== "event") return;
+          resetForNewEvent();
           state.modal = "wizard";
-          state.wizardStep = 1;
+          state.wizardBackdrop = "home";
+          saveState(state);
           navigate("#create/1");
           break;
 
@@ -2146,7 +2290,9 @@
           state.modal = "wizard";
           state.wizardStep = 2;
           state.showValidation = false;
+          state.wizardBackdrop = "overview";
           syncSessionFormInstructorsFromEvent();
+          saveState(state);
           navigate("#create/2");
           break;
 
