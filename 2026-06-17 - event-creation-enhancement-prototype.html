@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consolidated Event Creation — Highspot Prototype</title>
+  <!--
+    Feature: Consolidated Event Creation (Humana / Event-Based Learning)
+    Persona: Learning Administrator
+    Goal: Create an event with sessions and essential configuration in one guided flow
+    Out-of-scope: Backend/API, Enrollment/Registration/Reports tabs, full Settings editors,
+      Event Completion/Roles/Messages/Notifications, legacy disjointed flow comparison
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+  <style>
+    :root {
+      --nav-blue: #0c2340;
+      --nav-blue-mid: #123a5c;
+      --primary: #0073bb;
+      --primary-hover: #005a94;
+      --teal: #00838f;
+      --teal-light: #e0f4f6;
+      --teal-border: #00838f;
+      --surface: #ffffff;
+      --canvas-bg: #eef1f4;
+      --border: #d4dbe3;
+      --text: #1a1a1a;
+      --muted: #5c6570;
+      --footer-bg: #f5f7f9;
+      --sidebar-bg: #f0f3f6;
+      --info-banner: #e8f4fc;
+      --danger: #c62828;
+      --shadow: 0 12px 40px rgba(12, 35, 64, 0.18);
+      --radius: 8px;
+      --radius-sm: 4px;
+      --font: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --banner-blue: #0066cc;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text);
+      background: var(--canvas-bg);
+      min-height: 100vh;
+    }
+
+    /* ========== App shell ========== */
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .top-nav {
+      height: 52px;
+      background: linear-gradient(180deg, var(--nav-blue-mid) 0%, var(--nav-blue) 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 16px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .search-wrap { flex: 1; max-width: 520px; margin: 0 auto; position: relative; }
+    .search-wrap i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+    }
+
+    .search {
+      width: 100%;
+      height: 34px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.12);
+      color: #e8eef4;
+      padding: 0 12px 0 36px;
+      font-size: 13px;
+      outline: none;
+    }
+    .search::placeholder { color: rgba(255,255,255,0.55); }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+    }
+
+    .btn-new {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 14px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-new:hover { background: var(--primary-hover); }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.08); }
+
+    .badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #6b8cae;
+      border: 2px solid rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .body-row {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
+    .icon-rail {
+      width: 48px;
+      background: var(--nav-blue);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      gap: 4px;
+      flex-shrink: 0;
+      z-index: 5;
+    }
+
+    .icon-rail button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.75);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .icon-rail button:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+    .main-bg {
+      flex: 1;
+      background: var(--canvas-bg);
+      min-height: calc(100vh - 52px);
+    }
+
+    /* ========== Modal ========== */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 35, 64, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 50;
+    }
+    .overlay.hidden { display: none; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal--learning { width: min(640px, 96vw); max-height: min(88vh, 720px); }
+    .modal--wizard { width: min(920px, 96vw); max-height: min(92vh, 860px); }
+
+    .modal-header {
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .modal-header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.15); }
+
+    .modal-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      background: var(--footer-bg);
+      border-top: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .footer-right { display: flex; gap: 10px; align-items: center; }
+
+    .btn {
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+    }
+    .btn:hover:not(:disabled) { background: #f8f9fb; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); border-color: var(--primary-hover); }
+
+    .btn-teal {
+      background: var(--teal);
+      color: #fff;
+      border-color: var(--teal);
+    }
+    .btn-teal:hover:not(:disabled) { background: #006974; border-color: #006974; }
+
+    /* ========== New Learning cards ========== */
+    .learning-list { padding: 8px 0; }
+
+    .learning-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 20px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .learning-card:hover { background: #f8fafb; }
+    .learning-card.selected {
+      background: var(--teal-light);
+      border-left-color: var(--teal-border);
+    }
+
+    .learning-card-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--primary);
+    }
+
+    .learning-card-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .learning-card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* ========== Wizard ========== */
+    .wizard-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbfc;
+      flex-shrink: 0;
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .progress-step.active { color: var(--primary); font-weight: 700; }
+    .progress-step.done { color: var(--teal); }
+
+    .progress-step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .progress-step.active .progress-step-num {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .progress-step.done .progress-step-num {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .progress-sep { color: var(--border); font-size: 10px; }
+
+    .wizard-content { padding: 24px; }
+
+    .form-group { margin-bottom: 18px; }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .req { color: var(--danger); }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0,115,187,0.15);
+    }
+
+    .form-textarea { min-height: 80px; resize: vertical; }
+
+    .hint-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .text-link {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    .chip-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #eef1f4;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .chip-tag .remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 0;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .form-row { display: flex; gap: 16px; }
+    .form-row > * { flex: 1; }
+
+    .info-banner {
+      background: var(--info-banner);
+      border: 1px solid #b8d9f0;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--nav-blue);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .info-banner i { margin-top: 2px; color: var(--primary); flex-shrink: 0; }
+    .info-banner .dismiss {
+      margin-left: auto;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 0;
+    }
+
+    /* ========== Sessions step ========== */
+    .sessions-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .sessions-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .session-cards { margin-bottom: 20px; }
+
+    .session-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #fff;
+      position: relative;
+    }
+
+    .session-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .session-card-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-right: 12px;
+    }
+
+    .badge-upcoming {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #e3f2fd;
+      color: var(--primary);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .session-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .session-meta span { display: flex; align-items: center; gap: 6px; }
+    .session-meta i { color: var(--primary); width: 14px; }
+
+    .session-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .empty-sessions {
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 20px;
+      background: #fafbfc;
+    }
+    .empty-sessions i { font-size: 28px; color: var(--primary); margin-bottom: 8px; display: block; }
+
+    .add-another-session {
+      margin-top: 12px;
+    }
+
+    .add-another-session .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .session-form-panel {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      background: #fafbfc;
+    }
+
+    .session-form-panel h4 {
+      margin: 0 0 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .radio-group label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-weight: 400;
+      font-size: 13px;
+      cursor: pointer;
+      line-height: 1.4;
+    }
+    .radio-group input { margin-top: 3px; accent-color: var(--primary); flex-shrink: 0; }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 400;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* ========== Configuration step ========== */
+    .config-section {
+      margin-bottom: 24px;
+    }
+
+    .config-section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .config-section-title i { color: var(--muted); font-size: 13px; }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+
+    .toggle {
+      width: 44px;
+      height: 24px;
+      background: #ccc;
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+    .toggle.on { background: var(--primary); }
+    .toggle::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle.on::after { transform: translateX(20px); }
+
+    /* ========== Event Overview page ========== */
+    .event-page {
+      flex: 1;
+      background: #fff;
+      overflow-y: auto;
+      min-height: calc(100vh - 52px);
+    }
+
+    .event-header {
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .event-header-left { flex: 1; }
+
+    .event-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .event-title-row h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .event-meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .event-meta a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+    .event-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .event-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      gap: 0;
+    }
+
+    .event-tab {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      margin-bottom: -1px;
+    }
+    .event-tab:hover { color: var(--text); }
+    .event-tab.active {
+      color: var(--teal);
+      border-bottom-color: var(--teal);
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 32px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbfc;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .stat-item i { color: var(--primary); }
+    .stat-item strong { font-weight: 700; }
+
+    .overview-content { padding: 24px; max-width: 960px; }
+
+    .event-banner {
+      width: 100%;
+      height: 200px;
+      background: var(--banner-blue);
+      border-radius: var(--radius);
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .event-banner .edit-img {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+    }
+
+    .overview-title-block {
+      margin-bottom: 24px;
+    }
+
+    .overview-title-block h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .overview-date {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .overview-section { margin-bottom: 28px; }
+
+    .overview-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .overview-section-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .attendance-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .attendance-note a { color: var(--primary); font-weight: 600; text-decoration: none; }
+
+    .contact-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .contact-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #cfd8dc;
+    }
+
+    .contact-name { font-weight: 600; color: var(--primary); }
+    .contact-email { font-size: 12px; color: var(--muted); }
+
+    .settings-readonly {
+      padding: 24px;
+      max-width: 720px;
+    }
+
+    .settings-readonly .config-section {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .readonly-value {
+      font-size: 13px;
+      color: var(--text);
+      padding: 4px 0 4px 24px;
+    }
+
+    .placeholder-tab {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .validation-msg {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ========== Session type, conference, integrations ========== */
+    .session-type-radios label {
+      margin-bottom: 8px;
+    }
+
+    .conference-section {
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+
+    .conference-helper {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .integrations-list {
+      margin-top: 16px;
+    }
+
+    .integrations-list > .form-label {
+      margin-bottom: 10px;
+    }
+
+    .integration-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .integration-row:last-child {
+      border-bottom: none;
+    }
+
+    .integration-logo {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .integration-logo.zoom { background: #2d8cff; color: #fff; }
+    .integration-logo.teams { background: #5059c9; color: #fff; }
+    .integration-logo.meet { background: #fff; color: #ea4335; border: 1px solid var(--border); }
+
+    .integration-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .integration-name {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .integration-meta {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .integration-action {
+      flex-shrink: 0;
+    }
+
+    .link-action {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+    }
+    .link-action:hover { text-decoration: underline; }
+
+    .btn-link-account {
+      border-radius: var(--radius-sm);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--primary);
+      background: #fff;
+      color: var(--primary);
+    }
+    .btn-link-account:hover { background: #f0f7fc; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // ==== STRINGS / CONSTANTS ====
+    const STORAGE_KEY = "hs-event-create-v1";
+
+    const STRINGS = {
+      newLearning: "New Learning",
+      createEvent: "Create Event",
+      steps: ["Event", "Sessions", "Configuration"],
+      infoBannerSession: "Attending the registered session is required to complete the event.",
+      infoBannerRegAttendance: "'Session Registration and Attendance' setting cannot be changed after a learner has enrolled in the event.",
+      addAnotherSession: "Add another session",
+      placeholderTab: "This tab is not implemented in the prototype.",
+      learningTypes: [
+        { id: "lesson", icon: "fa-book-open", title: "Lesson", desc: "Create a SmartPages Lesson, import a SCORM Lesson to add to a course or create an external training" },
+        { id: "course", icon: "fa-book", title: "Course", desc: "Create a course and add lessons for learners to complete" },
+        { id: "event", icon: "fa-calendar-plus", title: "Event", desc: "Create an event with sessions for learners to attend" },
+        { id: "path", icon: "fa-layer-group", title: "Learning Path", desc: "Create a learning path and add a set of learning activities for learners to complete" },
+        { id: "rubric", icon: "fa-clipboard-check", title: "Rubric", desc: "Create a rubric for learners to reference and to be used to score lesson submissions" },
+      ],
+      configLabels: {
+        learningPaths: "Add Event to Learning Paths",
+        enrollment: "Manage Event Enrollment",
+        sessionReg: "Manage Session Registration",
+        regAttendance: "Session Registration and Attendance",
+        autoAttendance: "Auto-Attendance Tracking for Virtual Sessions",
+        selfMark: "Manage Self-Mark Attendance",
+      },
+    };
+
+    const TIMEZONES = [
+      "(GMT +05:30) Chennai, Kolkata, Mumbai, New Delhi",
+      "(GMT -08:00) Pacific Time",
+      "(GMT -05:00) Eastern Time",
+      "(GMT +00:00) UTC",
+    ];
+
+    const TIME_OPTIONS = [
+      "8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
+      "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM",
+      "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM",
+    ];
+
+    const SPOTS = ["Test Design Spot", "Anith's Content", "Team Spot", "Company Library"];
+
+    const PROVIDER_LABELS = {
+      zoom: "Zoom",
+      teams: "Microsoft Teams",
+      meet: "Google Meet",
+    };
+
+    const INTEGRATION_DEFS = [
+      { id: "zoom", name: "Zoom", logoClass: "zoom", icon: "fa-video" },
+      { id: "teams", name: "Microsoft Teams", logoClass: "teams", icon: "fa-brands fa-microsoft" },
+      { id: "meet", name: "Google Meet", logoClass: "meet", icon: "fa-brands fa-google" },
+    ];
+
+    function defaultIntegrations() {
+      return {
+        zoom: { linked: true, email: "david.davidson@highspot.com", linkedOn: "12/23/2025" },
+        teams: { linked: true, email: "david.davidson@highspot.com", linkedOn: "3/31/2026" },
+        meet: { linked: false, email: null, linkedOn: null },
+      };
+    }
+
+    // ==== STATE ====
+    function getDefaultState() {
+      return {
+        route: "home",
+        modal: null,
+        wizardStep: 1,
+        selectedLearningType: "event",
+        bannerDismissed: { sessions: false, overview: false },
+        event: {
+          title: "",
+          description: "",
+          spot: "Test Design Spot",
+          contact: "David Davidson",
+          contactEmail: "david.davidson@highspot.com",
+        },
+        sessions: [],
+        editingSessionId: null,
+        sessionForm: emptySessionForm(),
+        config: {
+          learningPaths: "yes",
+          enrollment: "invite",
+          sessionReg: "no-self",
+          regAttendance: "single",
+          autoAttendance: "opt-out",
+          selfMark: false,
+        },
+        integrations: defaultIntegrations(),
+        created: false,
+        activeTab: "overview",
+        showValidation: false,
+      };
+    }
+
+    function emptySessionForm() {
+      return {
+        title: "",
+        description: "",
+        instructors: ["David Davidson"],
+        timezone: TIMEZONES[0],
+        date: "",
+        startTime: "",
+        endTime: "",
+        regMin: "",
+        regMax: "",
+        waitlist: false,
+        type: "virtual",
+        conferenceProvider: "",
+      };
+    }
+
+    function addDaysToDateString(dateStr, days) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr + "T12:00:00");
+      d.setDate(d.getDate() + days);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function carryForwardSessionForm(savedSession) {
+      const { id, ...fields } = savedSession;
+      return {
+        ...fields,
+        title: "",
+        description: "",
+        date: addDaysToDateString(savedSession.date, 1),
+      };
+    }
+
+    function getState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return getDefaultState();
+        const saved = JSON.parse(raw);
+        const defaults = getDefaultState();
+        return {
+          ...defaults,
+          ...saved,
+          event: { ...defaults.event, ...(saved.event || {}) },
+          config: { ...defaults.config, ...(saved.config || {}) },
+          integrations: { ...defaults.integrations, ...(saved.integrations || {}) },
+          sessionForm: { ...emptySessionForm(), ...(saved.sessionForm || {}) },
+          bannerDismissed: { ...defaults.bannerDismissed, ...(saved.bannerDismissed || {}) },
+        };
+      } catch {
+        return getDefaultState();
+      }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    let state = getState();
+
+    // ==== ROUTING ====
+    function parseHash() {
+      const hash = location.hash.slice(1) || "home";
+      if (hash === "home") return { route: "home", modal: null, wizardStep: 1 };
+      if (hash === "new-learning") return { route: "home", modal: "learning", wizardStep: 1 };
+      if (hash === "overview") return { route: "overview", modal: null, wizardStep: 3 };
+      const createMatch = hash.match(/^create\/(\d)$/);
+      if (createMatch) {
+        return {
+          route: state.created ? "overview" : "home",
+          modal: "wizard",
+          wizardStep: parseInt(createMatch[1], 10),
+        };
+      }
+      return { route: "home", modal: null, wizardStep: 1 };
+    }
+
+    function navigate(hash) {
+      location.hash = hash;
+    }
+
+    window.addEventListener("hashchange", () => {
+      const parsed = parseHash();
+      state.route = parsed.route;
+      state.modal = parsed.modal;
+      state.wizardStep = parsed.wizardStep;
+      if (parsed.route === "overview" && !state.created) {
+        state.created = true;
+      }
+      saveState(state);
+      render();
+    });
+
+    // ==== HELPERS ====
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr + "T12:00:00");
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    }
+
+    function calcDuration(start, end) {
+      if (!start || !end) return "";
+      const parse = (t) => {
+        const m = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!m) return 0;
+        let h = parseInt(m[1], 10);
+        const min = parseInt(m[2], 10);
+        const pm = m[3].toUpperCase() === "PM";
+        if (pm && h !== 12) h += 12;
+        if (!pm && h === 12) h = 0;
+        return h * 60 + min;
+      };
+      const diff = parse(end) - parse(start);
+      if (diff <= 0) return "";
+      if (diff < 60) return diff + " minutes";
+      const hrs = Math.floor(diff / 60);
+      const mins = diff % 60;
+      return mins ? hrs + " hr " + mins + " min" : hrs + " hour" + (hrs > 1 ? "s" : "");
+    }
+
+    function needsConferenceProvider(type) {
+      return type === "virtual" || type === "hybrid";
+    }
+
+    function getLinkedProviders() {
+      return INTEGRATION_DEFS.filter((d) => state.integrations[d.id]?.linked);
+    }
+
+    function getSessionTypeDisplay(type) {
+      if (type === "virtual") return { label: "Virtual", icon: "fa-video" };
+      if (type === "hybrid") return { label: "Hybrid", icon: "fa-laptop" };
+      return { label: "In Person", icon: "fa-location-dot" };
+    }
+
+    function sessionFormValid(form) {
+      const base = form.title.trim() && form.date && form.startTime && form.endTime && form.instructors.length > 0;
+      if (!base) return false;
+      if (needsConferenceProvider(form.type)) {
+        return !!form.conferenceProvider && getLinkedProviders().some((p) => p.id === form.conferenceProvider);
+      }
+      return true;
+    }
+
+    function eventStepValid() {
+      return state.event.title.trim().length > 0;
+    }
+
+    function sessionsStepValid() {
+      return state.sessions.length > 0;
+    }
+
+    // ==== RENDER: Shell ==========
+    function renderShell(content) {
+      return `
+        <div class="app">
+          <header class="top-nav">
+            <span class="logo">HIGHSPOT</span>
+            <div class="search-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input class="search" type="search" placeholder="Search for content and people" aria-label="Search" />
+            </div>
+            <div class="nav-actions">
+              <button type="button" class="btn-new" data-action="open-learning">+ New</button>
+              <button type="button" class="icon-btn" aria-label="Notifications">
+                <i class="fa-regular fa-bell"></i>
+                <span class="badge">39</span>
+              </button>
+              <div class="avatar" title="Profile">AM</div>
+            </div>
+          </header>
+          <div class="body-row">
+            <nav class="icon-rail" aria-label="Primary">
+              <button type="button" title="Home"><i class="fa-solid fa-house"></i></button>
+              <button type="button" title="People"><i class="fa-solid fa-user-group"></i></button>
+              <button type="button" title="Learning"><i class="fa-solid fa-graduation-cap"></i></button>
+              <button type="button" title="Content"><i class="fa-solid fa-layer-group"></i></button>
+            </nav>
+            ${content}
+          </div>
+        </div>
+      `;
+    }
+
+    // ==== RENDER: New Learning Modal ====
+    function renderNewLearningModal() {
+      const cards = STRINGS.learningTypes.map((t) => `
+        <div class="learning-card ${state.selectedLearningType === t.id ? "selected" : ""}" data-action="select-learning" data-id="${t.id}">
+          <div class="learning-card-icon"><i class="fa-solid ${t.icon}"></i></div>
+          <div>
+            <div class="learning-card-title">${escapeHtml(t.title)}</div>
+            <div class="learning-card-desc">${escapeHtml(t.desc)}</div>
+          </div>
+        </div>
+      `).join("");
+
+      return `
+        <div class="overlay" role="dialog" aria-modal="true">
+          <div class="modal modal--learning">
+            <div class="modal-header">
+              <div class="modal-header-title">
+                <i class="fa-solid fa-graduation-cap"></i>
+                ${STRINGS.newLearning}
+              </div>
+              <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <div class="modal-body learning-list">${cards}</div>
+            <div class="modal-footer">
+              <span></span>
+              <div class="footer-right">
+                <button type="button" class="btn" data-action="close-modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-action="learning-next" ${state.selectedLearningType !== "event" ? "disabled" : ""}>Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Wizard Progress ====
+    function renderProgress() {
+      return STRINGS.steps.map((label, i) => {
+        const step = i + 1;
+        const cls = step === state.wizardStep ? "active" : step < state.wizardStep ? "done" : "";
+        const icon = step < state.wizardStep ? '<i class="fa-solid fa-check"></i>' : step;
+        const sep = i < STRINGS.steps.length - 1 ? '<span class="progress-sep"><i class="fa-solid fa-chevron-right"></i></span>' : "";
+        return `
+          <div class="progress-step ${cls}">
+            <span class="progress-step-num">${icon}</span>
+            ${label}
+          </div>${sep}
+        `;
+      }).join("");
+    }
+
+    // ==== RENDER: Wizard Step 1 ====
+    function renderStep1() {
+      return `
+        <div class="wizard-content">
+          <div class="form-group">
+            <label class="form-label">Title <span class="req">*</span></label>
+            <input class="form-input" type="text" data-field="event.title" value="${escapeHtml(state.event.title)}" placeholder="Enter event title" />
+            ${state.showValidation && !eventStepValid() ? '<div class="validation-msg">Title is required</div>' : ""}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <div class="hint-row">
+              <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
+              <button type="button" class="text-link">Text Preview</button>
+            </div>
+            <textarea class="form-textarea" data-field="event.description" placeholder="Describe the event for learners…">${escapeHtml(state.event.description)}</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Destination Spot <span class="req">*</span></label>
+            <select class="form-select" data-field="event.spot">
+              ${SPOTS.map((s) => `<option ${state.event.spot === s ? "selected" : ""}>${escapeHtml(s)}</option>`).join("")}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Event Contact</label>
+            <div class="chip-tag">
+              ${escapeHtml(state.event.contact)}
+              <button type="button" class="remove" aria-label="Remove">&times;</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Session card ====
+    function renderSessionCard(session) {
+      const duration = calcDuration(session.startTime, session.endTime);
+      const { label: typeLabel, icon: typeIcon } = getSessionTypeDisplay(session.type);
+      return `
+        <div class="session-card" data-session-id="${session.id}">
+          <div class="session-card-header">
+            <div>
+              <span class="session-card-title">${escapeHtml(session.title)}</span>
+              <span class="badge-upcoming">Upcoming</span>
+            </div>
+            <button type="button" class="icon-btn" style="color:var(--muted);width:28px;height:28px" data-action="remove-session" data-id="${session.id}" title="Remove">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="session-meta">
+            <span><i class="fa-regular fa-calendar"></i> ${formatDate(session.date)}</span>
+            <span><i class="fa-regular fa-clock"></i> ${escapeHtml(session.startTime)} GMT+5:30</span>
+            ${duration ? `<span><i class="fa-regular fa-hourglass"></i> ${duration}</span>` : ""}
+            <span><i class="fa-solid ${typeIcon}"></i> ${typeLabel}</span>
+          </div>
+          <div class="session-meta">
+            <span><i class="fa-regular fa-user"></i> ${escapeHtml(session.instructors.join(", "))}</span>
+            <span><i class="fa-solid fa-users"></i> 0 Learners Registered</span>
+          </div>
+          <div class="session-card-actions">
+            <button type="button" class="btn btn-primary" style="font-size:12px;padding:6px 12px" data-action="edit-session" data-id="${session.id}">Edit Session</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Session form ====
+    function renderIntegrationsList() {
+      return `
+        <div class="integrations-list">
+          <label class="form-label">Integrations</label>
+          ${INTEGRATION_DEFS.map((def) => {
+            const info = state.integrations[def.id];
+            const linked = info?.linked;
+            const iconClass = def.icon.startsWith("fa-brands") ? def.icon : "fa-solid " + def.icon;
+            return `
+              <div class="integration-row">
+                <div class="integration-logo ${def.logoClass}">
+                  <i class="${iconClass}"></i>
+                </div>
+                <div class="integration-details">
+                  <div class="integration-name">${escapeHtml(def.name)}</div>
+                  ${linked ? `
+                    <div class="integration-meta">Account: ${escapeHtml(info.email)}</div>
+                    <div class="integration-meta">Linked on: ${escapeHtml(info.linkedOn)}</div>
+                  ` : `<div class="integration-meta">Not linked</div>`}
+                </div>
+                <div class="integration-action">
+                  ${linked ? `
+                    <button type="button" class="link-action" data-action="unlink-integration" data-provider="${def.id}">
+                      <i class="fa-solid fa-link-slash"></i> Unlink Account
+                    </button>
+                  ` : `
+                    <button type="button" class="btn-link-account" data-action="link-integration" data-provider="${def.id}">Link Account</button>
+                  `}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderConferenceSection(f) {
+      if (!needsConferenceProvider(f.type)) return "";
+      const linked = getLinkedProviders();
+      const options = linked.map((p) =>
+        `<option value="${p.id}" ${f.conferenceProvider === p.id ? "selected" : ""}>${escapeHtml(PROVIDER_LABELS[p.id])}</option>`
+      ).join("");
+
+      return `
+        <div class="conference-section form-group">
+          <label class="form-label">Select Conference Provider <span class="req">*</span></label>
+          <select class="form-select" data-field="sessionForm.conferenceProvider">
+            <option value="">Select…</option>
+            ${options}
+          </select>
+          <p class="conference-helper">Save your session to automatically generate the video conferencing link.</p>
+          ${renderIntegrationsList()}
+        </div>
+      `;
+    }
+
+    function renderSessionForm() {
+      const f = state.sessionForm;
+      const isEdit = state.editingSessionId !== null;
+      const titlePlaceholder = !isEdit && state.sessions.length > 0
+        ? `Session ${state.sessions.length + 1}`
+        : "";
+      return `
+        <div class="session-form-panel" id="session-form-panel">
+          <h4><i class="fa-solid fa-${isEdit ? "pen" : "plus"}"></i> ${isEdit ? "Edit Session" : "Add Session"}</h4>
+          <div class="form-group">
+            <label class="form-label">Title <span class="req">*</span></label>
+            <input class="form-input" type="text" data-field="sessionForm.title" value="${escapeHtml(f.title)}" placeholder="${escapeHtml(titlePlaceholder)}" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <div class="hint-row">
+              <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
+              <button type="button" class="text-link">Text Preview</button>
+            </div>
+            <textarea class="form-textarea" data-field="sessionForm.description" placeholder="Enter a description for the session">${escapeHtml(f.description)}</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instructors <span class="req">*</span></label>
+            <div class="chip-tag">
+              ${f.instructors.map((i) => escapeHtml(i)).join(", ")}
+              <button type="button" class="remove">&times;</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Timezone</label>
+            <select class="form-select" data-field="sessionForm.timezone">
+              ${TIMEZONES.map((tz) => `<option ${f.timezone === tz ? "selected" : ""}>${escapeHtml(tz)}</option>`).join("")}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Session Date <span class="req">*</span></label>
+            <input class="form-input" type="date" data-field="sessionForm.date" value="${escapeHtml(f.date)}" />
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label class="form-label">Start Time <span class="req">*</span></label>
+              <select class="form-select" data-field="sessionForm.startTime">
+                <option value="">Select…</option>
+                ${TIME_OPTIONS.map((t) => `<option value="${t}" ${f.startTime === t ? "selected" : ""}>${t}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label class="form-label">End Time <span class="req">*</span></label>
+              <select class="form-select" data-field="sessionForm.endTime">
+                <option value="">Select…</option>
+                ${TIME_OPTIONS.map((t) => `<option value="${t}" ${f.endTime === t ? "selected" : ""}>${t}</option>`).join("")}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Registration Limit</label>
+            <div class="form-row">
+              <div>
+                <label class="form-label" style="font-weight:400;font-size:12px">Minimum</label>
+                <input class="form-input" type="number" data-field="sessionForm.regMin" value="${escapeHtml(f.regMin)}" placeholder="No Minimum" />
+              </div>
+              <div>
+                <label class="form-label" style="font-weight:400;font-size:12px">Maximum</label>
+                <input class="form-input" type="number" data-field="sessionForm.regMax" value="${escapeHtml(f.regMax)}" placeholder="No Maximum" />
+              </div>
+            </div>
+            <label class="checkbox-label">
+              <input type="checkbox" data-field="sessionForm.waitlist" ${f.waitlist ? "checked" : ""} />
+              Enable waitlists when limit is reached
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Session Type</label>
+            <div class="radio-group session-type-radios">
+              <label><input type="radio" name="sessionType" value="virtual" data-field="sessionForm.type" ${f.type === "virtual" ? "checked" : ""} /> Virtual</label>
+              <label><input type="radio" name="sessionType" value="in-person" data-field="sessionForm.type" ${f.type === "in-person" ? "checked" : ""} /> In Person</label>
+              <label><input type="radio" name="sessionType" value="hybrid" data-field="sessionForm.type" ${f.type === "hybrid" ? "checked" : ""} /> Hybrid</label>
+            </div>
+          </div>
+          ${renderConferenceSection(f)}
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+            ${isEdit ? '<button type="button" class="btn" data-action="cancel-edit-session">Cancel Edit</button>' : ""}
+            <button type="button" class="btn btn-primary" data-action="save-session" ${sessionFormValid(f) ? "" : "disabled"}>${isEdit ? "Update Session" : "Add Session"}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Wizard Step 2 ====
+    function renderStep2() {
+      const banner = !state.bannerDismissed.sessions ? `
+        <div class="info-banner" id="sessions-banner">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>${STRINGS.infoBannerSession}</span>
+          <button type="button" class="dismiss" data-action="dismiss-banner" data-target="sessions"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      ` : "";
+
+      const cards = state.sessions.length
+        ? `<div class="session-cards">${state.sessions.map(renderSessionCard).join("")}</div>`
+        : "";
+
+      const addAnotherBtn = `
+        <div class="add-another-session">
+          <button type="button" class="btn" data-action="add-another-session">
+            <i class="fa-solid fa-plus"></i> ${STRINGS.addAnotherSession}
+          </button>
+        </div>
+      `;
+
+      return `
+        <div class="wizard-content">
+          <div class="sessions-header">
+            <h3>Sessions</h3>
+          </div>
+          ${banner}
+          ${cards}
+          ${renderSessionForm()}
+          ${state.sessions.length > 0 && !state.editingSessionId ? addAnotherBtn : ""}
+          ${state.showValidation && !sessionsStepValid() ? '<div class="validation-msg" style="margin-top:12px">Add at least one session to continue.</div>' : ""}
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Wizard Step 3 ====
+    function renderConfigRadios(name, field, options) {
+      return options.map((o) => `
+        <label>
+          <input type="radio" name="${name}" value="${o.value}" data-field="config.${field}" ${state.config[field] === o.value ? "checked" : ""} />
+          ${escapeHtml(o.label)}
+        </label>
+      `).join("");
+    }
+
+    function renderStep3() {
+      return `
+        <div class="wizard-content">
+          <h3 style="margin:0 0 20px;font-size:16px">Event Configuration</h3>
+
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.learningPaths} <i class="fa-regular fa-circle-question" title="Info"></i></div>
+            <div class="radio-group">
+              ${renderConfigRadios("learningPaths", "learningPaths", [
+                { value: "yes", label: "Yes, this event can be added to learning paths and can have learners enrolled via learning paths" },
+                { value: "no", label: "No, this event cannot be added to learning paths (but will remain in any it was already added to)" },
+              ])}
+            </div>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.enrollment} <i class="fa-regular fa-circle-question"></i></div>
+            <div class="radio-group">
+              ${renderConfigRadios("enrollment", "enrollment", [
+                { value: "invite", label: "Set to invite-only" },
+                { value: "self", label: "Set to self-enroll" },
+              ])}
+            </div>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.sessionReg} <i class="fa-regular fa-circle-question"></i></div>
+            <div class="radio-group">
+              ${renderConfigRadios("sessionReg", "sessionReg", [
+                { value: "no-self", label: "Do not allow self-registration" },
+                { value: "self", label: "Set to self-registration" },
+              ])}
+            </div>
+          </div>
+
+          <div class="info-banner">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>${STRINGS.infoBannerRegAttendance}</span>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.regAttendance} <i class="fa-regular fa-circle-question"></i></div>
+            <div class="radio-group">
+              ${renderConfigRadios("regAttendance", "regAttendance", [
+                { value: "single", label: "Register for a single session and attend that session" },
+                { value: "all-all", label: "Register for all sessions and attend all sessions" },
+                { value: "all-one", label: "Register for all sessions and attend at least one session" },
+              ])}
+            </div>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.autoAttendance} <i class="fa-regular fa-circle-question"></i></div>
+            <div class="radio-group">
+              ${renderConfigRadios("autoAttendance", "autoAttendance", [
+                { value: "opt-out", label: "Opt out of auto-attendance tracking" },
+                { value: "auto", label: "Automatically mark learners as attended when they join the session" },
+                { value: "custom", label: "Customize attendance criteria for marking learners as attended" },
+              ])}
+            </div>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.selfMark} <i class="fa-regular fa-circle-question"></i></div>
+            <div class="toggle-row">
+              <span>Allow learners to mark their own attendance for live sessions</span>
+              <button type="button" class="toggle ${state.config.selfMark ? "on" : ""}" data-action="toggle-self-mark" aria-pressed="${state.config.selfMark}"></button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Wizard Modal ====
+    function renderWizardModal() {
+      const stepContent = state.wizardStep === 1 ? renderStep1()
+        : state.wizardStep === 2 ? renderStep2()
+        : renderStep3();
+
+      const backDisabled = state.wizardStep === 1;
+      const nextLabel = state.wizardStep === 3 ? STRINGS.createEvent
+        : (state.created && state.wizardStep === 2) ? "Done" : "Next";
+      const nextAction = state.wizardStep === 3 ? "create-event"
+        : (state.created && state.wizardStep === 2) ? "wizard-done" : "wizard-next";
+      const nextDisabled = state.wizardStep === 1 ? !eventStepValid()
+        : state.wizardStep === 2 ? !sessionsStepValid()
+        : false;
+
+      return `
+        <div class="overlay" role="dialog" aria-modal="true">
+          <div class="modal modal--wizard">
+            <div class="modal-header">
+              <div class="modal-header-title">
+                <i class="fa-regular fa-calendar-plus"></i>
+                Create Event
+              </div>
+              <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <div class="wizard-progress">${renderProgress()}</div>
+            <div class="modal-body">${stepContent}</div>
+            <div class="modal-footer">
+              <button type="button" class="btn" data-action="wizard-back" ${backDisabled ? "disabled" : ""}>Back</button>
+              <div class="footer-right">
+                <button type="button" class="btn" data-action="close-modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-action="${nextAction}" ${nextDisabled ? "disabled" : ""}>${nextLabel}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Overview ====
+    function configDisplayValue(field, value) {
+      const maps = {
+        learningPaths: { yes: "Yes, can be added to learning paths", no: "No, cannot be added to learning paths" },
+        enrollment: { invite: "Set to invite-only", self: "Set to self-enroll" },
+        sessionReg: { "no-self": "Do not allow self-registration", self: "Set to self-registration" },
+        regAttendance: {
+          single: "Register for a single session and attend that session",
+          "all-all": "Register for all sessions and attend all sessions",
+          "all-one": "Register for all sessions and attend at least one session",
+        },
+        autoAttendance: {
+          "opt-out": "Opt out of auto-attendance tracking",
+          auto: "Automatically mark learners as attended when they join the session",
+          custom: "Customize attendance criteria for marking learners as attended",
+        },
+      };
+      if (field === "selfMark") return value ? "Enabled" : "Disabled";
+      return (maps[field] && maps[field][value]) || value;
+    }
+
+    function renderOverviewTab() {
+      const firstSession = state.sessions[0];
+      const eventDate = firstSession ? formatDate(firstSession.date) : "No sessions added yet";
+      const autoTrack = state.config.autoAttendance === "opt-out" ? "Disabled" : "Enabled";
+
+      const banner = !state.bannerDismissed.overview ? `
+        <div class="info-banner">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>${STRINGS.infoBannerSession}</span>
+          <button type="button" class="dismiss" data-action="dismiss-banner" data-target="overview"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      ` : "";
+
+      const sessionCards = state.sessions.length
+        ? state.sessions.map(renderSessionCard).join("")
+        : `<div class="empty-sessions"><i class="fa-regular fa-calendar-plus"></i>You haven't added any sessions yet.</div>`;
+
+      return `
+        <div class="overview-content">
+          <div class="event-banner">
+            <button type="button" class="edit-img" aria-label="Edit image"><i class="fa-regular fa-image"></i></button>
+          </div>
+          <div class="overview-title-block">
+            <h2>${escapeHtml(state.event.title)} <i class="fa-solid fa-pencil" style="font-size:14px;color:var(--primary);cursor:pointer"></i></h2>
+            <div class="overview-date"><i class="fa-regular fa-calendar"></i> ${eventDate}</div>
+          </div>
+          <div class="overview-section">
+            <div class="overview-section-header">
+              <h3>Sessions</h3>
+              <button type="button" class="btn" data-action="add-sessions-overview">Add Sessions</button>
+            </div>
+            <div class="attendance-note">Auto-Attendance Tracking: <strong>${autoTrack}</strong> | <a href="#" data-action="switch-tab" data-tab="settings">Manage in Settings</a></div>
+            ${banner}
+            ${sessionCards}
+          </div>
+          <div class="overview-section">
+            <h3>Event Contact</h3>
+            <div class="contact-card" style="margin-top:12px">
+              <div class="contact-avatar"></div>
+              <div>
+                <div class="contact-name">${escapeHtml(state.event.contact)}</div>
+                <div class="contact-email">${escapeHtml(state.event.contactEmail)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSettingsTab() {
+      const fields = ["learningPaths", "enrollment", "sessionReg", "regAttendance", "autoAttendance", "selfMark"];
+      return `
+        <div class="settings-readonly">
+          <h3 style="margin:0 0 20px">Event Configuration</h3>
+          <p style="color:var(--muted);margin-bottom:24px;font-size:13px">Settings captured during event creation. Full editors for Completion, Roles, Messages, and Notifications remain on the production Settings tab.</p>
+          ${fields.map((f) => `
+            <div class="config-section">
+              <div class="config-section-title">${STRINGS.configLabels[f] || f}</div>
+              <div class="readonly-value">${escapeHtml(configDisplayValue(f, state.config[f]))}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderEventPage() {
+      const tabs = [
+        { id: "overview", label: "Overview" },
+        { id: "enrollment", label: "Enrollment" },
+        { id: "registration", label: "Registration & Attendance" },
+        { id: "reports", label: "Reports" },
+        { id: "settings", label: "Settings" },
+      ];
+
+      const tabContent = state.activeTab === "overview" ? renderOverviewTab()
+        : state.activeTab === "settings" ? renderSettingsTab()
+        : `<div class="placeholder-tab">${STRINGS.placeholderTab}</div>`;
+
+      return `
+        <div class="event-page">
+          <div class="event-header">
+            <div class="event-header-left">
+              <div class="event-title-row">
+                <button type="button" class="icon-btn" style="color:var(--text);width:28px;height:28px;border:1px solid var(--border)"><i class="fa-solid fa-arrow-left"></i></button>
+                <button type="button" class="icon-btn" style="color:var(--text);width:28px;height:28px;border:1px solid var(--border)"><i class="fa-solid fa-house"></i></button>
+                <h1>${escapeHtml(state.event.title)}</h1>
+              </div>
+              <div class="event-meta">
+                <span style="width:8px;height:8px;background:var(--primary);border-radius:50%;display:inline-block"></span>
+                <a href="#">${escapeHtml(state.event.spot)}</a>
+                <span>·</span>
+                <span><i class="fa-regular fa-calendar"></i> Event</span>
+                <span>·</span>
+                <span>Added just now</span>
+              </div>
+            </div>
+            <div class="event-header-actions">
+              <button type="button" class="btn btn-teal">Manage Event</button>
+              <button type="button" class="btn">View Event</button>
+              <button type="button" class="icon-btn" style="color:var(--text);border:1px solid var(--border)"><i class="fa-regular fa-circle-question"></i></button>
+              <button type="button" class="icon-btn" style="color:var(--text);border:1px solid var(--border)"><i class="fa-solid fa-ellipsis"></i></button>
+            </div>
+          </div>
+          <div class="event-tabs">
+            ${tabs.map((t) => `
+              <button type="button" class="event-tab ${state.activeTab === t.id ? "active" : ""}" data-action="switch-tab" data-tab="${t.id}">${t.label}</button>
+            `).join("")}
+          </div>
+          <div class="stats-bar">
+            <div class="stat-item"><i class="fa-solid fa-users"></i> <strong>0</strong> Learners</div>
+            <div class="stat-item"><i class="fa-regular fa-calendar-check"></i> <strong>0</strong> Learners Registered</div>
+            <div class="stat-item"><i class="fa-regular fa-calendar"></i> <strong>0%</strong> Average Event Attendance</div>
+          </div>
+          ${tabContent}
+        </div>
+      `;
+    }
+
+    // ==== RENDER: Main ====
+    function render() {
+      const isOverview = state.created || state.route === "overview" || location.hash === "#overview";
+      const content = isOverview
+        ? renderEventPage()
+        : `<div class="main-bg"></div>`;
+
+      let modal = "";
+      if (state.modal === "learning") modal = renderNewLearningModal();
+      else if (state.modal === "wizard") modal = renderWizardModal();
+
+      document.getElementById("app").innerHTML = renderShell(content) + modal;
+      bindEvents();
+      updateWizardButtons();
+    }
+
+    // ==== HANDLERS ====
+    function setField(path, value) {
+      const parts = path.split(".");
+      let obj = state;
+      for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+      obj[parts[parts.length - 1]] = value;
+      saveState(state);
+    }
+
+    function updateWizardButtons() {
+      const app = document.getElementById("app");
+      if (state.modal !== "wizard") return;
+      const nextBtn = app.querySelector('[data-action="wizard-next"], [data-action="create-event"]');
+      const saveBtn = app.querySelector('[data-action="save-session"]');
+      if (state.wizardStep === 1 && nextBtn) nextBtn.disabled = !eventStepValid();
+      if (state.wizardStep === 2) {
+        if (nextBtn) nextBtn.disabled = !sessionsStepValid();
+        if (saveBtn) saveBtn.disabled = !sessionFormValid(state.sessionForm);
+      }
+    }
+
+    function bindEvents() {
+      const app = document.getElementById("app");
+
+      app.querySelectorAll("[data-action]").forEach((el) => {
+        el.addEventListener("click", (e) => {
+          const action = el.getAttribute("data-action");
+          handleAction(action, el, e);
+        });
+      });
+
+      app.querySelectorAll("[data-field]").forEach((el) => {
+        const eventType = el.type === "checkbox" || el.type === "radio" ? "change" : "input";
+        el.addEventListener(eventType, () => {
+          const path = el.getAttribute("data-field");
+          let value;
+          if (el.type === "checkbox") value = el.checked;
+          else if (el.type === "radio") { if (!el.checked) return; value = el.value; }
+          else value = el.value;
+          setField(path, value);
+          if (path === "sessionForm.type") {
+            if (value === "in-person") {
+              state.sessionForm.conferenceProvider = "";
+              saveState(state);
+            }
+            render();
+            return;
+          }
+          if (path === "sessionForm.conferenceProvider") {
+            updateWizardButtons();
+            return;
+          }
+          updateWizardButtons();
+        });
+      });
+    }
+
+    function handleAction(action, el, e) {
+      e.preventDefault();
+
+      switch (action) {
+        case "open-learning":
+          state.modal = "learning";
+          state.selectedLearningType = "event";
+          navigate("#new-learning");
+          break;
+
+        case "close-modal":
+          state.modal = null;
+          state.showValidation = false;
+          if (state.created) navigate("#overview");
+          else navigate("#home");
+          break;
+
+        case "select-learning":
+          state.selectedLearningType = el.getAttribute("data-id");
+          saveState(state);
+          render();
+          break;
+
+        case "learning-next":
+          if (state.selectedLearningType !== "event") return;
+          state.modal = "wizard";
+          state.wizardStep = 1;
+          navigate("#create/1");
+          break;
+
+        case "wizard-back":
+          if (state.wizardStep > 1) {
+            state.wizardStep--;
+            navigate("#create/" + state.wizardStep);
+          }
+          break;
+
+        case "wizard-next":
+          if (state.wizardStep === 1 && !eventStepValid()) {
+            state.showValidation = true;
+            saveState(state);
+            render();
+            return;
+          }
+          if (state.wizardStep === 2 && !sessionsStepValid()) {
+            state.showValidation = true;
+            saveState(state);
+            render();
+            return;
+          }
+          state.showValidation = false;
+          if (state.wizardStep < 3) {
+            state.wizardStep++;
+            navigate("#create/" + state.wizardStep);
+          }
+          break;
+
+        case "add-sessions-overview":
+          state.modal = "wizard";
+          state.wizardStep = 2;
+          state.showValidation = false;
+          navigate("#create/2");
+          break;
+
+        case "wizard-done":
+          state.modal = null;
+          state.showValidation = false;
+          navigate("#overview");
+          break;
+
+        case "create-event":
+          state.created = true;
+          state.modal = null;
+          state.activeTab = "overview";
+          navigate("#overview");
+          break;
+
+        case "save-session": {
+          const f = { ...state.sessionForm, id: state.editingSessionId || "s-" + Date.now() };
+          if (!sessionFormValid(f)) return;
+          if (state.editingSessionId) {
+            state.sessions = state.sessions.map((s) => s.id === state.editingSessionId ? f : s);
+            state.editingSessionId = null;
+          } else {
+            state.sessions.push(f);
+          }
+          state.sessionForm = emptySessionForm();
+          saveState(state);
+          render();
+          break;
+        }
+
+        case "add-another-session": {
+          const last = state.sessions[state.sessions.length - 1];
+          if (!last) return;
+          state.sessionForm = carryForwardSessionForm(last);
+          state.editingSessionId = null;
+          saveState(state);
+          render();
+          requestAnimationFrame(() => {
+            const panel = document.getElementById("session-form-panel");
+            if (panel) panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            const titleInput = panel?.querySelector('[data-field="sessionForm.title"]');
+            if (titleInput) titleInput.focus();
+          });
+          break;
+        }
+
+        case "edit-session": {
+          const id = el.getAttribute("data-id");
+          const session = state.sessions.find((s) => s.id === id);
+          if (session) {
+            state.editingSessionId = id;
+            state.sessionForm = { ...session };
+            saveState(state);
+            render();
+          }
+          break;
+        }
+
+        case "cancel-edit-session":
+          state.editingSessionId = null;
+          state.sessionForm = emptySessionForm();
+          saveState(state);
+          render();
+          break;
+
+        case "remove-session": {
+          const id = el.getAttribute("data-id");
+          state.sessions = state.sessions.filter((s) => s.id !== id);
+          if (state.editingSessionId === id) {
+            state.editingSessionId = null;
+            state.sessionForm = emptySessionForm();
+          }
+          saveState(state);
+          render();
+          break;
+        }
+
+        case "toggle-self-mark":
+          state.config.selfMark = !state.config.selfMark;
+          saveState(state);
+          render();
+          break;
+
+        case "dismiss-banner":
+          state.bannerDismissed[el.getAttribute("data-target")] = true;
+          saveState(state);
+          render();
+          break;
+
+        case "switch-tab":
+          state.activeTab = el.getAttribute("data-tab");
+          saveState(state);
+          render();
+          break;
+
+        case "link-integration": {
+          const provider = el.getAttribute("data-provider");
+          state.integrations[provider] = {
+            linked: true,
+            email: "david.davidson@highspot.com",
+            linkedOn: new Date().toLocaleDateString("en-US"),
+          };
+          saveState(state);
+          render();
+          break;
+        }
+
+        case "unlink-integration": {
+          const provider = el.getAttribute("data-provider");
+          state.integrations[provider] = { linked: false, email: null, linkedOn: null };
+          if (state.sessionForm.conferenceProvider === provider) {
+            state.sessionForm.conferenceProvider = "";
+          }
+          saveState(state);
+          render();
+          break;
+        }
+      }
+    }
+
+    // ==== INIT ====
+    (function init() {
+      const parsed = parseHash();
+      state.route = parsed.route;
+      state.modal = parsed.modal;
+      state.wizardStep = parsed.wizardStep;
+      if (parsed.route === "overview") state.created = true;
+      if (!location.hash) location.hash = "home";
+      render();
+    })();
+  </script>
+</body>
+</html>
