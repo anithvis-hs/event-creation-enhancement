@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Consolidated Event Creation — Highspot Prototype</title>
+  <!-- v2: IA streamlining — regAttendance to Step 3, grouped Configuration, visual provider picker, Step 1/2 field redistribution -->
   <!--
     Feature: Consolidated Event Creation (Humana / Event-Based Learning)
     Persona: Learning Administrator
@@ -13,7 +14,7 @@
   -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
   <style>
     :root {
@@ -29,7 +30,7 @@
       --border: #d4dbe3;
       --text: #1a1a1a;
       --muted: #5c6570;
-      --footer-bg: #f5f7f9;
+      --footer-bg: #f6f6f6;
       --sidebar-bg: #f0f3f6;
       --info-banner: #e8f4fc;
       --danger: #c62828;
@@ -37,7 +38,7 @@
       --shadow: 0 12px 40px rgba(12, 35, 64, 0.18);
       --radius: 8px;
       --radius-sm: 4px;
-      --font: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --font: "Source Sans Pro", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       --banner-blue: #0066cc;
     }
 
@@ -311,15 +312,57 @@
 
     .modal--learning { width: min(640px, 96vw); max-height: min(88vh, 720px); }
     .modal--wizard {
-      width: min(920px, 96vw);
-      max-height: min(92vh, 860px);
-      min-height: min(520px, 80vh);
+      width: min(843px, 96vw);
+      height: min(720px, calc(100vh - 48px));
+      max-height: min(960px, calc(100vh - 48px));
+      border: 1px solid #cfcfcf;
+      border-radius: 8px;
+    }
+
+    .modal-header-session-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .modal-header-back {
+      width: 32px;
+      height: 32px;
+      background: #e9e9e9;
+      border: none;
+      color: #2c2c2c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-size: 15px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .modal-header-back:hover {
+      background: #dedede;
+    }
+
+    .modal-body--session-configure {
+      padding: 16px;
+    }
+
+    .session-configure-content {
+      max-width: 568px;
+      width: 100%;
+      margin: 0 auto;
     }
 
     .modal-header {
-      background: var(--primary);
-      color: #fff;
-      padding: 12px 16px;
+      background: #f6f6f6;
+      color: var(--text);
+      height: 69px;
+      min-height: 69px;
+      padding: 16px;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -331,46 +374,65 @@
       align-items: center;
       gap: 10px;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 16px;
     }
 
     .modal-close {
       background: transparent;
       border: none;
-      color: #fff;
-      font-size: 18px;
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 0;
       border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .modal-close:hover { background: rgba(255,255,255,0.15); }
+    .modal-close:hover { background: #ececec; }
+
+    .modal-header .modal-close {
+      background: #e9e9e9;
+      border: none;
+      color: #2c2c2c;
+    }
+
+    .modal-header .modal-close:hover {
+      background: #dedede;
+    }
 
     .modal-header--wizard {
-      background: #fff;
+      background: #f6f6f6;
       color: var(--text);
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
+      height: 69px;
+      min-height: 69px;
+      padding: 16px;
+      box-sizing: border-box;
+      border-bottom: 1px solid #cbcbcb;
     }
 
     .modal-header--wizard .modal-header-title {
       margin: 0;
-      font-weight: 700;
-      font-size: 15px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #2e2e2e;
     }
 
     .modal-close--neutral {
-      width: 28px;
-      height: 28px;
-      background: #fff;
-      border: 1px solid var(--border);
-      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      background: #e9e9e9;
+      border: none;
+      color: #2c2c2c;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0;
-      font-size: 14px;
+      font-size: 15px;
     }
-    .modal-close--neutral:hover { background: #f8f9fb; }
+    .modal-close--neutral:hover { background: #dedede; }
 
     .modal-body {
       flex: 1;
@@ -381,14 +443,30 @@
     .modal-footer {
       background: var(--footer-bg);
       border-top: 1px solid var(--border);
-      padding: 12px 20px;
+      height: 69px;
+      min-height: 69px;
+      padding: 16px;
+      box-sizing: border-box;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
     }
 
-    .footer-right { display: flex; gap: 10px; align-items: center; }
+    .modal-footer .btn {
+      height: 36px;
+      padding: 0 18px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer-right { display: flex; gap: 12px; align-items: center; }
+
+    .modal--wizard .modal-footer {
+      border-top-color: #cbcbcb;
+    }
 
     .btn {
       border-radius: var(--radius-sm);
@@ -464,13 +542,28 @@
       display: flex;
       flex: 1;
       min-height: 0;
+      background: #fbfbfb;
+    }
+
+    .wizard-body--session-configure {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .wizard-body--session-configure .modal-body--session-configure {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
     }
 
     .wizard-sidebar {
-      width: 230px;
+      width: 200px;
       flex-shrink: 0;
-      border-right: 1px solid var(--border);
-      background: #fff;
+      border-right: 1px solid #cfcfcf;
+      background: #fbfbfb;
       padding: 20px 0;
     }
 
@@ -485,6 +578,7 @@
     .wizard-main .modal-body {
       flex: 1;
       overflow-y: auto;
+      background: #fbfbfb;
     }
 
     .wizard-stepper {
@@ -576,14 +670,22 @@
       color: var(--muted);
     }
 
-    .wizard-content { padding: 24px; }
+    .wizard-content { padding: 16px; }
+
+    .wizard-content > h3 {
+      margin: 0 0 20px;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 20px;
+      color: #000;
+    }
 
     .form-group { margin-bottom: 18px; }
 
     .form-label {
       display: block;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
       margin-bottom: 6px;
     }
 
@@ -608,6 +710,48 @@
     }
 
     .form-textarea { min-height: 80px; resize: vertical; }
+
+    .form-input--date,
+    .form-select--time,
+    .form-input--number {
+      width: 200px;
+      max-width: 200px;
+    }
+
+    .form-row--compact {
+      flex-wrap: wrap;
+    }
+
+    .form-row--time-pair {
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .session-schedule-group {
+      margin-bottom: 0;
+    }
+
+    .session-schedule-group .form-group:last-child {
+      margin-bottom: 18px;
+    }
+
+    .form-input-icon-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-input-icon-wrap > i {
+      position: absolute;
+      left: 10px;
+      color: var(--primary);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .form-input-icon-wrap .form-input {
+      padding-left: 32px;
+    }
 
     .banner-upload-placeholder {
       border: 1px solid var(--border);
@@ -733,6 +877,10 @@
     .form-row { display: flex; gap: 16px; }
     .form-row > * { flex: 1; }
 
+    .form-row.form-row--compact > * {
+      flex: 0 0 auto;
+    }
+
     .info-banner {
       background: var(--info-banner);
       border: 1px solid #b8d9f0;
@@ -758,16 +906,31 @@
 
     /* ========== Sessions step ========== */
     .sessions-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     .sessions-header h3 {
       margin: 0;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 600;
+      line-height: 20px;
+      color: #000;
+    }
+
+    .sessions-step-intro {
+      margin: 4px 0 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: #000;
+    }
+
+    .sessions-saved-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0 0 10px;
     }
 
     .session-cards { margin-bottom: 20px; }
@@ -847,22 +1010,9 @@
     }
     .empty-sessions i { font-size: 28px; color: var(--primary); margin-bottom: 8px; display: block; }
 
-    .step2-empty-state {
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      text-align: center;
+    .form-label-optional {
+      font-weight: 400;
       color: var(--muted);
-      margin-bottom: 16px;
-      background: #fafbfc;
-      font-size: 13px;
-    }
-
-    .step2-empty-state i {
-      font-size: 24px;
-      color: var(--primary);
-      margin-bottom: 8px;
-      display: block;
     }
 
     .add-another-session {
@@ -876,6 +1026,177 @@
       font-size: 13px;
     }
 
+    /* ========== Session slot cards (Step 2) ========== */
+    .session-slot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .session-slot-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid #cfcfcf;
+      border-radius: 8px;
+      padding: 17px;
+      background: #fff;
+    }
+
+    .session-slot-index {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #e9f3fc;
+      color: #298de1;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .session-slot-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .session-slot-title {
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 20px;
+      color: #353535;
+      margin-bottom: 4px;
+    }
+
+    .session-slot-status {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 14px;
+    }
+
+    .badge-not-configured {
+      background: #f8eae8;
+      color: #d60822;
+    }
+
+    .badge-configured {
+      background: var(--teal-light);
+      color: var(--teal);
+    }
+
+    .session-slot-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-configure {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-configure:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .session-slot-menu-wrap {
+      position: relative;
+    }
+
+    .session-slot-menu-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .session-slot-menu-btn:hover {
+      background: #f5f7f9;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .session-slot-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      min-width: 140px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 16px rgba(12, 35, 64, 0.12);
+      z-index: 10;
+      padding: 4px 0;
+    }
+
+    .session-slot-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 8px 14px;
+      border: none;
+      background: none;
+      text-align: left;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .session-slot-menu-item i {
+      width: 14px;
+      text-align: center;
+      flex-shrink: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .session-slot-menu-item:hover:not(:disabled) {
+      background: #f5f7f9;
+    }
+
+    .session-slot-menu-item:disabled {
+      color: #bbb;
+      cursor: not-allowed;
+    }
+
+    .session-slot-menu-item--danger:not(:disabled) {
+      color: var(--danger);
+    }
+
+    .session-slot-menu-item--danger:not(:disabled) i {
+      color: var(--danger);
+    }
+
+    .btn-add-session {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
     .session-form-panel {
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -883,11 +1204,28 @@
       background: #fafbfc;
     }
 
-    .session-form-panel h4 {
+    .session-form-panel-header {
       margin: 0 0 16px;
+    }
+
+    .session-form-panel-header h4 {
+      margin: 0 0 4px;
       font-size: 14px;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--text);
+    }
+
+    .session-form-panel-subtitle {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .session-form-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4px 0 18px;
     }
 
     .radio-group label {
@@ -896,7 +1234,7 @@
       gap: 10px;
       margin-bottom: 10px;
       font-weight: 400;
-      font-size: 13px;
+      font-size: 14px;
       cursor: pointer;
       line-height: 1.4;
     }
@@ -925,6 +1263,26 @@
       margin-bottom: 12px;
     }
     .config-section-title i { color: var(--muted); font-size: 13px; }
+
+    .config-group-title {
+      margin: 28px 0 16px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .config-group-title:first-of-type {
+      margin-top: 0;
+    }
+
+    .form-helper {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.45;
+    }
 
     .toggle-row {
       display: flex;
@@ -1272,34 +1630,75 @@
       margin-bottom: 8px;
     }
 
-    .conference-section {
-      margin-top: 4px;
-      padding-top: 4px;
+    .session-type-provider-nested {
+      margin-top: 14px;
+      padding-top: 14px;
       border-top: 1px solid var(--border);
     }
 
-    .conference-helper {
+    .form-sublabel {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .provider-footer {
       font-size: 12px;
       color: var(--muted);
-      margin-top: 6px;
+      margin-top: 8px;
+      margin-bottom: 0;
       line-height: 1.4;
     }
 
-    .integrations-settings-note {
-      margin-top: 4px;
+    .provider-empty-state {
+      padding: 14px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: #fafbfc;
+      text-align: center;
     }
 
-    .integrations-quick-access {
-      margin-top: 10px;
-      font-size: 12px;
+    .provider-empty-state p {
+      margin: 0 0 10px;
+      font-size: 13px;
       color: var(--muted);
     }
 
-    .integrations-quick-text {
+    .provider-compact-row {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 4px;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .provider-compact-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .provider-compact-label .integration-logo {
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+    }
+
+    .session-slot-meeting-link {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .integrations-panel {
@@ -1310,6 +1709,59 @@
 
     .integrations-panel .integration-row:first-child {
       padding-top: 0;
+    }
+
+    .provider-tiles {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .provider-tile {
+      width: 100px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      background: #fff;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .provider-tile:hover { border-color: var(--primary); }
+
+    .provider-tile.selected {
+      border-color: var(--teal);
+      background: var(--teal-light);
+    }
+
+    .provider-tile.unlinked {
+      opacity: 0.65;
+      border-style: dashed;
+    }
+
+    .provider-tile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .provider-tile-icon.zoom { background: #2d8cff; color: #fff; }
+    .provider-tile-icon.teams { background: #5059c9; color: #fff; }
+    .provider-tile-icon.meet { background: #fff; color: #ea4335; border: 1px solid var(--border); }
+
+    .provider-tile-name { font-size: 11px; font-weight: 600; }
+
+    .provider-tile-action {
+      font-size: 10px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-top: 4px;
     }
 
     .integrations-list {
@@ -1407,10 +1859,47 @@
     const STRINGS = {
       newLearning: "New Learning",
       createEvent: "Create Event",
-      steps: ["Event", "Sessions", "Configuration"],
+      steps: ["Event details", "Sessions", "Configuration"],
+      defaultInstructorsHelper: "Pre-fills new sessions; you can change per session.",
+      configGroups: {
+        access: "Access & enrollment",
+        registration: "Registration & attendance",
+      },
       infoBannerSession: "Attending the registered session is required to complete the event.",
       infoBannerRegAttendance: "'Session Registration and Attendance' setting cannot be changed after a learner has enrolled in the event.",
       addAnotherSession: "Add another session",
+      saveSession: "Save session",
+      updateSession: "Update session",
+      sessionsStep: {
+        introFirst: "At least one session is required. Configure each session below to continue.",
+        introHasSaved: (n) => `${n} session${n > 1 ? "s" : ""} configured — add more or click Next when ready.`,
+        moveUp: "Move Up",
+        moveDown: "Move Down",
+        deleteSession: "Delete",
+        addSession: "Add Session",
+        unnamedSession: "Unnamed Session",
+        configured: "Configured",
+        notConfigured: "Not Configured",
+        configure: "Configure",
+        edit: "Edit",
+        savedLabel: "Saved sessions",
+        subtitleFirst: "Required fields are marked with *.",
+        subtitleAnother: "Schedule and settings carry forward — update title and date, then save.",
+        subtitleEdit: "Update fields and save your changes.",
+        locationPlaceholder: "Enter address or room",
+        locationRequired: "Location is required",
+        videoPlatform: "Video platform",
+        manageAccounts: "Manage accounts",
+        connectToContinue: "Connect a video account to select a platform.",
+        connectAccount: "Connect account",
+        connectTile: "Connect",
+        changeProvider: "Change",
+        conferenceProviderRequired: "Select a video platform",
+        meetingLinkLabel: "Meeting link",
+        meetingLinkCopy: "Copy link",
+        sessionConfigureTitle: (n) => `Session ${n}`,
+        done: "Done",
+      },
       placeholderTab: "This tab is not implemented in the prototype.",
       learningTypes: [
         { id: "lesson", icon: "fa-book-open", title: "Lesson", desc: "Create a SmartPages Lesson, import a SCORM Lesson to add to a course or create an external training" },
@@ -1451,6 +1940,12 @@
 
     const SPOTS = ["Test Design Spot", "Anith's Content", "Team Spot", "Company Library"];
 
+    const MOCK_CONTACTS = [
+      { name: "David Davidson", email: "david.davidson@highspot.com" },
+      { name: "Sarah Chen", email: "sarah.chen@highspot.com" },
+      { name: "Alex Rivera", email: "alex.rivera@highspot.com" },
+    ];
+
     const PROVIDER_LABELS = {
       zoom: "Zoom",
       teams: "Microsoft Teams",
@@ -1469,7 +1964,7 @@
       '<stop offset="0%" stop-color="#0066cc"/><stop offset="100%" stop-color="#00838f"/></linearGradient></defs>' +
       '<rect width="100%" height="100%" fill="url(#g)"/>' +
       '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" ' +
-      'font-family="Inter,sans-serif" font-size="22" font-weight="600">Clinical Excellence Summit 2026</text></svg>'
+      'font-family="Source Sans Pro,sans-serif" font-size="22" font-weight="600">Clinical Excellence Summit 2026</text></svg>'
     );
 
     function defaultIntegrations() {
@@ -1498,6 +1993,7 @@
           sessionInstructors: ["David Davidson"],
         },
         sessions: [],
+        sessionSlots: defaultSessionSlots(),
         editingSessionId: null,
         sessionForm: emptySessionForm(),
         config: {
@@ -1514,14 +2010,114 @@
         showValidation: false,
         showSessionFormValidation: false,
         integrationsPanelOpen: false,
+        providerPickerExpanded: false,
         wizardBackdrop: "home",
+        focusSessionTitleOnRender: false,
+        openSlotMenuId: null,
+        activeSessionSlotId: null,
       };
+    }
+
+    function createSessionSlot(sessionId) {
+      return { id: "slot-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6), sessionId: sessionId || null };
+    }
+
+    function defaultSessionSlots() {
+      return [createSessionSlot(null)];
+    }
+
+    function migrateSessionSlots(saved) {
+      if (saved.sessionSlots && saved.sessionSlots.length > 0) return saved.sessionSlots;
+      if (saved.sessions && saved.sessions.length > 0) {
+        return saved.sessions.map((s) => ({ id: "slot-" + s.id, sessionId: s.id }));
+      }
+      return defaultSessionSlots();
+    }
+
+    function getConfiguredSlotCount() {
+      return state.sessionSlots.filter(
+        (slot) => slot.sessionId && state.sessions.some((s) => s.id === slot.sessionId)
+      ).length;
+    }
+
+    function getSlotIndex(slotId) {
+      return state.sessionSlots.findIndex((s) => s.id === slotId);
+    }
+
+    function getLastConfiguredSessionBeforeSlotIndex(index) {
+      for (let i = index - 1; i >= 0; i--) {
+        const slot = state.sessionSlots[i];
+        if (slot.sessionId) {
+          const session = state.sessions.find((s) => s.id === slot.sessionId);
+          if (session) return session;
+        }
+      }
+      return null;
+    }
+
+    function loadSessionFormForSlot(slotId) {
+      const slot = state.sessionSlots.find((s) => s.id === slotId);
+      if (!slot) return;
+      const index = getSlotIndex(slotId);
+      if (slot.sessionId) {
+        const session = state.sessions.find((s) => s.id === slot.sessionId);
+        if (session) {
+          state.sessionForm = { ...session };
+          state.editingSessionId = session.id;
+          applyConferenceProviderDefaults(state.sessionForm);
+          state.providerPickerExpanded = getLinkedProviders().length !== 1;
+          return;
+        }
+      }
+      const prior = getLastConfiguredSessionBeforeSlotIndex(index);
+      if (prior) {
+        state.sessionForm = carryForwardSessionForm(prior);
+      } else if (state.event.sessionInstructors?.length) {
+        state.sessionForm = { ...emptySessionForm(), instructors: [...state.event.sessionInstructors] };
+      } else {
+        state.sessionForm = emptySessionForm();
+      }
+      applyConferenceProviderDefaults(state.sessionForm);
+      state.providerPickerExpanded = getLinkedProviders().length !== 1;
+      state.editingSessionId = null;
+    }
+
+    function closeSessionConfigure() {
+      state.activeSessionSlotId = null;
+      state.editingSessionId = null;
+      state.sessionForm = emptySessionForm();
+      state.showSessionFormValidation = false;
+      state.integrationsPanelOpen = false;
+      state.providerPickerExpanded = false;
+    }
+
+    function commitSessionForActiveSlot() {
+      const slot = state.sessionSlots.find((s) => s.id === state.activeSessionSlotId);
+      const f = enrichSessionOnSave({
+        ...state.sessionForm,
+        id: state.editingSessionId || slot?.sessionId || "s-" + Date.now(),
+      });
+      if (!sessionFormValid(f)) return false;
+      if (state.sessions.some((s) => s.id === f.id)) {
+        state.sessions = state.sessions.map((s) => (s.id === f.id ? f : s));
+      } else {
+        state.sessions.push(f);
+      }
+      if (slot) slot.sessionId = f.id;
+      state.activeSessionSlotId = null;
+      state.editingSessionId = null;
+      state.sessionForm = emptySessionForm();
+      state.showSessionFormValidation = false;
+      state.integrationsPanelOpen = false;
+      state.providerPickerExpanded = false;
+      return true;
     }
 
     function resetForNewEvent() {
       const defaults = getDefaultState();
       state.event = { ...defaults.event };
       state.sessions = [];
+      state.sessionSlots = defaultSessionSlots();
       state.sessionForm = emptySessionForm();
       state.config = { ...defaults.config };
       state.integrations = defaultIntegrations();
@@ -1529,6 +2125,9 @@
       state.showValidation = false;
       state.showSessionFormValidation = false;
       state.integrationsPanelOpen = false;
+      state.focusSessionTitleOnRender = false;
+      state.openSlotMenuId = null;
+      state.activeSessionSlotId = null;
       state.created = false;
       state.wizardStep = 1;
     }
@@ -1547,6 +2146,7 @@
         waitlist: false,
         type: "virtual",
         conferenceProvider: "",
+        location: "",
       };
     }
 
@@ -1558,13 +2158,50 @@
     }
 
     function carryForwardSessionForm(savedSession) {
-      const { id, ...fields } = savedSession;
+      const { id, meetingLink, ...fields } = savedSession;
       return {
         ...fields,
         title: "",
         description: "",
         date: addDaysToDateString(savedSession.date, 1),
+        conferenceProvider: fields.conferenceProvider || "",
       };
+    }
+
+    function generateMeetingLink(providerId) {
+      const links = {
+        zoom: "https://zoom.us/j/123456789",
+        teams: "https://teams.microsoft.com/l/meetup-join/abc123",
+        meet: "https://meet.google.com/abc-defg-hij",
+      };
+      return links[providerId] || "";
+    }
+
+    function applyConferenceProviderDefaults(form = state.sessionForm) {
+      if (!needsConferenceProvider(form.type)) return;
+      const linked = getLinkedProviders();
+      if (linked.length === 0) {
+        form.conferenceProvider = "";
+        return;
+      }
+      if (linked.length === 1) {
+        if (!form.conferenceProvider || !linked.some((p) => p.id === form.conferenceProvider)) {
+          form.conferenceProvider = linked[0].id;
+        }
+        return;
+      }
+      if (form.conferenceProvider && !linked.some((p) => p.id === form.conferenceProvider)) {
+        form.conferenceProvider = "";
+      }
+    }
+
+    function enrichSessionOnSave(session) {
+      if (needsConferenceProvider(session.type) && session.conferenceProvider) {
+        session.meetingLink = generateMeetingLink(session.conferenceProvider);
+      } else {
+        session.meetingLink = null;
+      }
+      return session;
     }
 
     function getSampleEventData() {
@@ -1596,6 +2233,8 @@
             waitlist: true,
             type: "virtual",
             conferenceProvider: "zoom",
+            location: "",
+            meetingLink: "https://zoom.us/j/123456789",
           },
           {
             id: "s-sample-2",
@@ -1611,6 +2250,8 @@
             waitlist: false,
             type: "virtual",
             conferenceProvider: "teams",
+            location: "",
+            meetingLink: "https://teams.microsoft.com/l/meetup-join/abc123",
           },
         ],
         config: {
@@ -1629,6 +2270,7 @@
       const sample = getSampleEventData();
       state.event = { ...sample.event };
       state.sessions = [...sample.sessions];
+      state.sessionSlots = sample.sessions.map((s) => ({ id: "slot-" + s.id, sessionId: s.id }));
       state.config = { ...sample.config };
       state.integrations = { ...sample.integrations };
       state.sessionForm = emptySessionForm();
@@ -1656,7 +2298,7 @@
         if (!raw) return getDefaultState();
         const saved = JSON.parse(raw);
         const defaults = getDefaultState();
-        return {
+        const merged = {
           ...defaults,
           ...saved,
           event: { ...defaults.event, ...(saved.event || {}) },
@@ -1665,6 +2307,8 @@
           sessionForm: { ...emptySessionForm(), ...(saved.sessionForm || {}) },
           bannerDismissed: { ...defaults.bannerDismissed, ...(saved.bannerDismissed || {}) },
         };
+        merged.sessionSlots = migrateSessionSlots(saved);
+        return merged;
       } catch {
         return getDefaultState();
       }
@@ -1794,6 +2438,10 @@
       return type === "virtual" || type === "hybrid";
     }
 
+    function needsLocation(type) {
+      return type === "in-person" || type === "hybrid";
+    }
+
     function getLinkedProviders() {
       return INTEGRATION_DEFS.filter((d) => state.integrations[d.id]?.linked);
     }
@@ -1815,10 +2463,13 @@
       }
       if (!form.instructors.length) errors.instructors = "At least one instructor is required";
       if (needsConferenceProvider(form.type)) {
-        if (!form.conferenceProvider) errors.conferenceProvider = "Select a conference provider";
+        if (!form.conferenceProvider) errors.conferenceProvider = STRINGS.sessionsStep.conferenceProviderRequired;
         else if (!getLinkedProviders().some((p) => p.id === form.conferenceProvider)) {
-          errors.conferenceProvider = "Selected provider must be linked";
+          errors.conferenceProvider = STRINGS.sessionsStep.conferenceProviderRequired;
         }
+      }
+      if (needsLocation(form.type) && !form.location?.trim()) {
+        errors.location = STRINGS.sessionsStep.locationRequired;
       }
       return errors;
     }
@@ -1959,6 +2610,10 @@
 
     // ==== RENDER: Wizard Step 1 ====
     function renderStep1() {
+      const contactOptions = MOCK_CONTACTS.map((c) =>
+        `<option value="${escapeHtml(c.email)}" ${state.event.contactEmail === c.email ? "selected" : ""}>${escapeHtml(c.name)}</option>`
+      ).join("");
+
       return `
         <div class="wizard-content">
           <div class="form-group">
@@ -1984,20 +2639,6 @@
             </select>
             ${state.showValidation && state.event.title.trim() && !state.event.spot ? '<div class="validation-msg">Spot is required</div>' : ""}
           </div>
-          <div class="info-banner">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>${STRINGS.infoBannerRegAttendance}</span>
-          </div>
-          <div class="config-section">
-            <div class="config-section-title">${STRINGS.configLabels.regAttendance} <span class="req">*</span> <i class="fa-regular fa-circle-question"></i></div>
-            <div class="radio-group">
-              ${renderConfigRadios("regAttendance", "regAttendance", [
-                { value: "single", label: "Register for a single session and attend that session" },
-                { value: "all-all", label: "Register for all sessions and attend all sessions" },
-                { value: "all-one", label: "Register for all sessions and attend at least one session" },
-              ])}
-            </div>
-          </div>
           <div class="form-group">
             <label class="form-label">Event Banner Image</label>
             <div class="banner-upload-placeholder${isBannerDataUrl(state.event.bannerImage) ? " has-preview" : ""}">${renderBannerPreviewHtml(state.event.bannerImage, { alt: "Event banner preview" })}</div>
@@ -2005,9 +2646,16 @@
             <button type="button" class="btn" data-action="upload-banner">Upload Image</button>
           </div>
           <div class="form-group">
-            <label class="form-label">Session Instructors</label>
+            <label class="form-label">Event Contact</label>
+            <select class="form-select" data-action="select-event-contact">
+              ${contactOptions}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Default session instructors</label>
+            <p class="form-helper">${STRINGS.defaultInstructorsHelper}</p>
             ${renderChipInput(state.event.sessionInstructors || [], {
-              ariaLabel: "Session Instructors",
+              ariaLabel: "Default session instructors",
               removeAction: "remove-event-instructor",
             })}
           </div>
@@ -2034,6 +2682,15 @@
           ${escapeHtml(PROVIDER_LABELS[session.conferenceProvider])}
         </span>
       ` : "";
+      const locationMeta = needsLocation(session.type) && session.location ? `
+        <span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(session.location)}</span>
+      ` : "";
+      const meetingLinkMeta = needsConferenceProvider(session.type) && session.meetingLink ? `
+        <span class="session-slot-meeting-link" style="margin-top:0">
+          <span>${STRINGS.sessionsStep.meetingLinkLabel} ·</span>
+          <button type="button" class="text-link" data-action="copy-meeting-link" data-link="${escapeHtml(session.meetingLink)}">${STRINGS.sessionsStep.meetingLinkCopy}</button>
+        </span>
+      ` : "";
 
       return `
         <div class="session-card" data-session-id="${session.id}">
@@ -2052,6 +2709,8 @@
             ${duration ? `<span><i class="fa-regular fa-hourglass"></i> ${duration}</span>` : ""}
             <span><i class="fa-solid ${typeIcon}"></i> ${typeLabel}</span>
             ${providerMeta}
+            ${locationMeta}
+            ${meetingLinkMeta}
           </div>
           <div class="session-meta">
             <span><i class="fa-regular fa-user"></i> ${escapeHtml(session.instructors.join(", "))}</span>
@@ -2101,109 +2760,129 @@
       `;
     }
 
-    function renderConferenceSection(f) {
+    function renderProviderTiles(f) {
+      return INTEGRATION_DEFS.map((def) => {
+        const info = state.integrations[def.id];
+        const linked = info?.linked;
+        const selected = linked && f.conferenceProvider === def.id;
+        const iconClass = def.icon.startsWith("fa-brands") ? def.icon : "fa-solid " + def.icon;
+        return `
+          <div class="provider-tile ${selected ? "selected" : ""} ${linked ? "" : "unlinked"}"
+               data-action="${linked ? "select-provider" : "link-provider-tile"}"
+               data-provider="${def.id}"
+               role="button"
+               tabindex="0"
+               aria-pressed="${selected}">
+            <div class="provider-tile-icon ${def.logoClass}"><i class="${iconClass}"></i></div>
+            <div class="provider-tile-name">${escapeHtml(def.name)}</div>
+            ${linked
+              ? (selected ? `<div class="provider-tile-action"><i class="fa-solid fa-check"></i> Selected</div>` : "")
+              : `<div class="provider-tile-action">${STRINGS.sessionsStep.connectTile}</div>`}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderProviderFooter(linked) {
+      return `<p class="provider-footer"><button type="button" class="text-link" data-action="toggle-integrations-panel">${STRINGS.sessionsStep.manageAccounts}</button></p>`;
+    }
+
+    function renderProviderPicker(f) {
       if (!needsConferenceProvider(f.type)) return "";
       const linked = getLinkedProviders();
-      const noneLinked = linked.length === 0;
       const errors = state.showSessionFormValidation ? getSessionFormErrors(f) : {};
-      const options = linked.map((p) =>
-        `<option value="${p.id}" ${f.conferenceProvider === p.id ? "selected" : ""}>${escapeHtml(PROVIDER_LABELS[p.id])}</option>`
-      ).join("");
+      const showTiles = linked.length === 0 ? false : linked.length > 1 || state.providerPickerExpanded;
+
+      let pickerBody = "";
+      if (linked.length === 0) {
+        pickerBody = `
+          <div class="provider-empty-state">
+            <p>${STRINGS.sessionsStep.connectToContinue}</p>
+            <button type="button" class="btn btn-primary" data-action="toggle-integrations-panel">${STRINGS.sessionsStep.connectAccount}</button>
+          </div>
+        `;
+      } else if (!showTiles) {
+        const provider = linked[0];
+        const def = INTEGRATION_DEFS.find((d) => d.id === provider.id);
+        const iconClass = def.icon.startsWith("fa-brands") ? def.icon : "fa-solid " + def.icon;
+        pickerBody = `
+          <div class="provider-compact-row">
+            <span class="provider-compact-label">
+              <span class="integration-logo ${def.logoClass}"><i class="${iconClass}"></i></span>
+              ${escapeHtml(PROVIDER_LABELS[provider.id])}
+            </span>
+            <button type="button" class="text-link" data-action="expand-provider-picker">${STRINGS.sessionsStep.changeProvider}</button>
+          </div>
+        `;
+      } else {
+        pickerBody = `<div class="provider-tiles">${renderProviderTiles(f)}</div>`;
+      }
 
       return `
-        <div class="conference-section form-group">
-          <label class="form-label">Select Conference Provider <span class="req">*</span></label>
-          <select class="form-select" data-field="sessionForm.conferenceProvider">
-            <option value="">Select…</option>
-            ${options}
-          </select>
+        <div class="session-type-provider-nested">
+          <label class="form-sublabel">${STRINGS.sessionsStep.videoPlatform} <span class="req">*</span></label>
+          ${pickerBody}
           ${errors.conferenceProvider ? `<div class="validation-msg">${errors.conferenceProvider}</div>` : ""}
-          <p class="conference-helper">Save your session to automatically generate the video conferencing link.</p>
-          <p class="conference-helper integrations-settings-note">Accounts can also be linked in Settings. Link here for quick access.</p>
-          <div class="integrations-quick-access">
-            <span class="integrations-quick-text">
-              ${noneLinked
-                ? 'No accounts linked. <button type="button" class="text-link" data-action="toggle-integrations-panel">Link account</button>'
-                : `${linked.length} account${linked.length > 1 ? "s" : ""} linked. <button type="button" class="text-link" data-action="toggle-integrations-panel">Manage video accounts</button>`}
-            </span>
-          </div>
+          ${renderProviderFooter(linked)}
           ${state.integrationsPanelOpen ? renderIntegrationsPanel() : ""}
         </div>
       `;
     }
 
-    function renderSessionForm() {
+    function renderLocationSection(f) {
+      if (!needsLocation(f.type)) return "";
+      const errors = state.showSessionFormValidation ? getSessionFormErrors(f) : {};
+      return `
+        <div class="form-group">
+          <label class="form-label">Location <span class="req">*</span></label>
+          <div class="form-input-icon-wrap">
+            <i class="fa-solid fa-location-dot"></i>
+            <input class="form-input" type="text" data-field="sessionForm.location" value="${escapeHtml(f.location || "")}" placeholder="${STRINGS.sessionsStep.locationPlaceholder}" />
+          </div>
+          ${errors.location ? `<div class="validation-msg">${errors.location}</div>` : ""}
+        </div>
+      `;
+    }
+
+    function getSessionFormPanelTitle() {
+      const isEdit = state.editingSessionId !== null;
+      const title = state.sessionForm.title.trim();
+      if (isEdit) {
+        return title ? `Edit: ${title}` : "Edit session";
+      }
+      return `Session ${state.sessions.length + 1}`;
+    }
+
+    function getSessionFormSubtitle() {
+      const isEdit = state.editingSessionId !== null;
+      if (isEdit) return STRINGS.sessionsStep.subtitleEdit;
+      if (state.sessions.length === 0) return STRINGS.sessionsStep.subtitleFirst;
+      return STRINGS.sessionsStep.subtitleAnother;
+    }
+
+    function renderSessionForm(options = {}) {
+      const embedded = options.embedded === true;
       const f = state.sessionForm;
       const isEdit = state.editingSessionId !== null;
       const errors = state.showSessionFormValidation ? getSessionFormErrors(f) : {};
-      return `
-        <div class="session-form-panel" id="session-form-panel">
-          <h4><i class="fa-solid fa-${isEdit ? "pen" : "plus"}"></i> ${isEdit ? "Edit Session" : "Add Session"}</h4>
+      const panelClass = embedded ? "" : "session-form-panel";
+      const panelId = embedded ? "" : ' id="session-form-panel"';
+      const headerBlock = embedded ? "" : `
+          <div class="session-form-panel-header">
+            <h4>${escapeHtml(getSessionFormPanelTitle())}</h4>
+            <p class="session-form-panel-subtitle">${escapeHtml(getSessionFormSubtitle())}</p>
+          </div>`;
+      const footerBlock = embedded ? "" : `
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+            ${isEdit ? '<button type="button" class="btn" data-action="cancel-edit-session">Cancel</button>' : ""}
+            <button type="button" class="btn btn-primary" data-action="save-session">${isEdit ? STRINGS.updateSession : STRINGS.saveSession}</button>
+          </div>`;
+      const formInner = `
+          ${headerBlock}
           <div class="form-group">
             <label class="form-label">Title <span class="req">*</span></label>
             <input class="form-input" type="text" data-field="sessionForm.title" value="${escapeHtml(f.title)}" />
             ${errors.title ? `<div class="validation-msg">${errors.title}</div>` : ""}
-          </div>
-          <div class="form-group">
-            <div class="form-label-row">
-              <label class="form-label">Description</label>
-              <div class="hint-row">
-                <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
-                <button type="button" class="text-link">Text Preview</button>
-              </div>
-            </div>
-            <textarea class="form-textarea" data-field="sessionForm.description">${escapeHtml(f.description)}</textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Instructors <span class="req">*</span></label>
-            ${renderChipInput(f.instructors, { ariaLabel: "Instructors", removeAction: "remove-instructor" })}
-            ${errors.instructors ? `<div class="validation-msg">${errors.instructors}</div>` : ""}
-          </div>
-          <div class="form-group">
-            <label class="form-label">Timezone</label>
-            <select class="form-select" data-field="sessionForm.timezone">
-              ${TIMEZONES.map((tz) => `<option ${f.timezone === tz ? "selected" : ""}>${escapeHtml(tz)}</option>`).join("")}
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Session Date <span class="req">*</span></label>
-            <input class="form-input" type="date" data-field="sessionForm.date" value="${escapeHtml(f.date)}" />
-            ${errors.date ? `<div class="validation-msg">${errors.date}</div>` : ""}
-          </div>
-          <div class="form-row form-group">
-            <div>
-              <label class="form-label">Start Time <span class="req">*</span></label>
-              <select class="form-select" data-field="sessionForm.startTime">
-                <option value="">Select…</option>
-                ${TIME_OPTIONS.map((t) => `<option value="${t}" ${f.startTime === t ? "selected" : ""}>${t}</option>`).join("")}
-              </select>
-              ${errors.startTime ? `<div class="validation-msg">${errors.startTime}</div>` : ""}
-            </div>
-            <div>
-              <label class="form-label">End Time <span class="req">*</span></label>
-              <select class="form-select" data-field="sessionForm.endTime">
-                <option value="">Select…</option>
-                ${TIME_OPTIONS.map((t) => `<option value="${t}" ${f.endTime === t ? "selected" : ""}>${t}</option>`).join("")}
-              </select>
-              ${errors.endTime ? `<div class="validation-msg">${errors.endTime}</div>` : ""}
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Registration Limit</label>
-            <div class="form-row">
-              <div>
-                <label class="form-label" style="font-weight:400;font-size:12px">Minimum</label>
-                <input class="form-input" type="number" data-field="sessionForm.regMin" value="${escapeHtml(f.regMin)}" placeholder="No Minimum" />
-              </div>
-              <div>
-                <label class="form-label" style="font-weight:400;font-size:12px">Maximum</label>
-                <input class="form-input" type="number" data-field="sessionForm.regMax" value="${escapeHtml(f.regMax)}" placeholder="No Maximum" />
-              </div>
-            </div>
-            <label class="checkbox-label">
-              <input type="checkbox" data-field="sessionForm.waitlist" ${f.waitlist ? "checked" : ""} />
-              Enable waitlists when limit is reached
-            </label>
           </div>
           <div class="form-group">
             <label class="form-label">Session Type</label>
@@ -2212,11 +2891,129 @@
               <label><input type="radio" name="sessionType" value="in-person" data-field="sessionForm.type" ${f.type === "in-person" ? "checked" : ""} /> In Person</label>
               <label><input type="radio" name="sessionType" value="hybrid" data-field="sessionForm.type" ${f.type === "hybrid" ? "checked" : ""} /> Hybrid</label>
             </div>
+            ${renderProviderPicker(f)}
           </div>
-          ${renderConferenceSection(f)}
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-            ${isEdit ? '<button type="button" class="btn" data-action="cancel-edit-session">Cancel Edit</button>' : ""}
-            <button type="button" class="btn btn-primary" data-action="save-session">${isEdit ? "Update Session" : "Add Session"}</button>
+          ${renderLocationSection(f)}
+          <hr class="session-form-divider" />
+          <div class="session-schedule-group">
+            <div class="form-group">
+              <label class="form-label">Session Date <span class="req">*</span></label>
+              <input class="form-input form-input--date" type="date" data-field="sessionForm.date" value="${escapeHtml(f.date)}" />
+              ${errors.date ? `<div class="validation-msg">${errors.date}</div>` : ""}
+            </div>
+            <div class="form-row form-row--compact form-row--time-pair form-group">
+              <div>
+                <label class="form-label">Start Time <span class="req">*</span></label>
+                <select class="form-select form-select--time" data-field="sessionForm.startTime">
+                  <option value="">Select…</option>
+                  ${TIME_OPTIONS.map((t) => `<option value="${t}" ${f.startTime === t ? "selected" : ""}>${t}</option>`).join("")}
+                </select>
+                ${errors.startTime ? `<div class="validation-msg">${errors.startTime}</div>` : ""}
+              </div>
+              <div>
+                <label class="form-label">End Time <span class="req">*</span></label>
+                <select class="form-select form-select--time" data-field="sessionForm.endTime">
+                  <option value="">Select…</option>
+                  ${TIME_OPTIONS.map((t) => `<option value="${t}" ${f.endTime === t ? "selected" : ""}>${t}</option>`).join("")}
+                </select>
+                ${errors.endTime ? `<div class="validation-msg">${errors.endTime}</div>` : ""}
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Timezone</label>
+            <select class="form-select" data-field="sessionForm.timezone">
+              ${TIMEZONES.map((tz) => `<option ${f.timezone === tz ? "selected" : ""}>${escapeHtml(tz)}</option>`).join("")}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instructors <span class="req">*</span></label>
+            ${renderChipInput(f.instructors, { ariaLabel: "Instructors", removeAction: "remove-instructor" })}
+            ${errors.instructors ? `<div class="validation-msg">${errors.instructors}</div>` : ""}
+          </div>
+          <div class="form-group">
+            <div class="form-label-row">
+              <label class="form-label">Description <span class="form-label-optional">(optional)</span></label>
+              <div class="hint-row">
+                <span style="color:var(--muted)"><i class="fa-regular fa-circle-question"></i></span>
+                <button type="button" class="text-link">Text Preview</button>
+              </div>
+            </div>
+            <textarea class="form-textarea" data-field="sessionForm.description">${escapeHtml(f.description)}</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Registration Limit <span class="form-label-optional">(optional)</span></label>
+            <div class="form-row form-row--compact form-row--time-pair">
+              <div>
+                <label class="form-label" style="font-weight:400;font-size:12px">Minimum</label>
+                <input class="form-input form-input--number" type="number" data-field="sessionForm.regMin" value="${escapeHtml(f.regMin)}" placeholder="No minimum" />
+              </div>
+              <div>
+                <label class="form-label" style="font-weight:400;font-size:12px">Maximum</label>
+                <input class="form-input form-input--number" type="number" data-field="sessionForm.regMax" value="${escapeHtml(f.regMax)}" placeholder="No maximum" />
+              </div>
+            </div>
+            <label class="checkbox-label">
+              <input type="checkbox" data-field="sessionForm.waitlist" ${f.waitlist ? "checked" : ""} />
+              Enable waitlists when limit is reached
+            </label>
+          </div>
+          ${footerBlock}
+      `;
+      if (embedded) return formInner;
+      return `<div class="${panelClass}"${panelId}>${formInner}</div>`;
+    }
+
+    function renderSessionConfigurePanel() {
+      const slotIndex = getSlotIndex(state.activeSessionSlotId);
+      if (slotIndex < 0) return null;
+      const title = STRINGS.sessionsStep.sessionConfigureTitle(slotIndex + 1);
+      const doneDisabled = !sessionFormValid(state.sessionForm);
+      return { title, doneDisabled };
+    }
+
+    // ==== RENDER: Session slot card (Step 2) ====
+    function renderSessionSlotCard(slot, index, total) {
+      const session = slot.sessionId ? state.sessions.find((s) => s.id === slot.sessionId) : null;
+      const configured = !!session;
+      const title = session?.title?.trim() || STRINGS.sessionsStep.unnamedSession;
+      const menuOpen = state.openSlotMenuId === slot.id;
+
+      const menu = menuOpen ? `
+        <div class="session-slot-menu" role="menu">
+          <button type="button" class="session-slot-menu-item" data-action="move-slot-up" data-slot-id="${slot.id}" ${index === 0 ? "disabled" : ""}><i class="fa-solid fa-arrow-up" aria-hidden="true"></i>${STRINGS.sessionsStep.moveUp}</button>
+          <button type="button" class="session-slot-menu-item" data-action="move-slot-down" data-slot-id="${slot.id}" ${index === total - 1 ? "disabled" : ""}><i class="fa-solid fa-arrow-down" aria-hidden="true"></i>${STRINGS.sessionsStep.moveDown}</button>
+          <button type="button" class="session-slot-menu-item session-slot-menu-item--danger" data-action="delete-session-slot" data-slot-id="${slot.id}" ${total <= 1 ? "disabled" : ""}><i class="fa-solid fa-trash-can" aria-hidden="true"></i>${STRINGS.sessionsStep.deleteSession}</button>
+        </div>
+      ` : "";
+
+      const meetingLink = session?.meetingLink
+        || (session && needsConferenceProvider(session.type) && session.conferenceProvider
+          ? generateMeetingLink(session.conferenceProvider)
+          : null);
+      const meetingLinkRow = configured && meetingLink ? `
+            <div class="session-slot-meeting-link">
+              <span>${STRINGS.sessionsStep.meetingLinkLabel} ·</span>
+              <button type="button" class="text-link" data-action="copy-meeting-link" data-link="${escapeHtml(meetingLink)}">${STRINGS.sessionsStep.meetingLinkCopy}</button>
+            </div>
+          ` : "";
+
+      return `
+        <div class="session-slot-card" data-slot-id="${slot.id}">
+          <span class="session-slot-index" aria-hidden="true">${index + 1}</span>
+          <div class="session-slot-body">
+            <div class="session-slot-title">${escapeHtml(title)}</div>
+            <span class="session-slot-status ${configured ? "badge-configured" : "badge-not-configured"}">${configured ? STRINGS.sessionsStep.configured : STRINGS.sessionsStep.notConfigured}</span>
+            ${meetingLinkRow}
+          </div>
+          <div class="session-slot-actions">
+            <button type="button" class="btn btn-configure" data-action="configure-session" data-slot-id="${slot.id}">${configured ? STRINGS.sessionsStep.edit : STRINGS.sessionsStep.configure}</button>
+            <div class="session-slot-menu-wrap">
+              <button type="button" class="icon-btn session-slot-menu-btn" data-action="toggle-slot-menu" data-slot-id="${slot.id}" aria-label="Session options" aria-expanded="${menuOpen}">
+                <i class="fa-solid fa-ellipsis"></i>
+              </button>
+              ${menu}
+            </div>
           </div>
         </div>
       `;
@@ -2224,27 +3021,25 @@
 
     // ==== RENDER: Wizard Step 2 ====
     function renderStep2() {
-      const cards = state.sessions.length
-        ? `<div class="session-cards">${state.sessions.map(renderSessionCard).join("")}</div>`
-        : `<div class="step2-empty-state"><i class="fa-regular fa-calendar-plus"></i>Add your first session below</div>`;
-
-      const addAnotherBtn = `
-        <div class="add-another-session">
-          <button type="button" class="btn" data-action="add-another-session">
-            <i class="fa-solid fa-plus"></i> ${STRINGS.addAnotherSession}
-          </button>
-        </div>
-      `;
+      const slots = state.sessionSlots || defaultSessionSlots();
+      const configured = getConfiguredSlotCount();
+      const stepIntro = configured === 0
+        ? STRINGS.sessionsStep.introFirst
+        : STRINGS.sessionsStep.introHasSaved(configured);
 
       return `
         <div class="wizard-content">
           <div class="sessions-header">
             <h3>Sessions</h3>
+            <p class="sessions-step-intro">${escapeHtml(stepIntro)}</p>
           </div>
-          ${cards}
-          ${renderSessionForm()}
-          ${state.sessions.length > 0 && !state.editingSessionId ? addAnotherBtn : ""}
-          ${state.showValidation && !sessionsStepValid() ? '<div class="validation-msg" style="margin-top:12px">Add at least one session to continue.</div>' : ""}
+          <div class="session-slot-list">
+            ${slots.map((slot, i) => renderSessionSlotCard(slot, i, slots.length)).join("")}
+          </div>
+          <button type="button" class="btn btn-add-session" data-action="add-session-slot">
+            <i class="fa-solid fa-plus"></i> ${STRINGS.sessionsStep.addSession}
+          </button>
+          ${state.showValidation && !sessionsStepValid() ? '<div class="validation-msg" style="margin-top:12px">Configure at least one session to continue.</div>' : ""}
         </div>
       `;
     }
@@ -2259,10 +3054,16 @@
       `).join("");
     }
 
+    function renderConfigGroupHeading(title) {
+      return `<h4 class="config-group-title">${escapeHtml(title)}</h4>`;
+    }
+
     function renderStep3() {
       return `
         <div class="wizard-content">
-          <h3 style="margin:0 0 20px;font-size:16px">Event Configuration</h3>
+          <h3>Event configuration</h3>
+
+          ${renderConfigGroupHeading(STRINGS.configGroups.access)}
 
           <div class="config-section">
             <div class="config-section-title">${STRINGS.configLabels.learningPaths} <i class="fa-regular fa-circle-question" title="Info"></i></div>
@@ -2284,12 +3085,30 @@
             </div>
           </div>
 
+          ${renderConfigGroupHeading(STRINGS.configGroups.registration)}
+
           <div class="config-section">
             <div class="config-section-title">${STRINGS.configLabels.sessionReg} <i class="fa-regular fa-circle-question"></i></div>
             <div class="radio-group">
               ${renderConfigRadios("sessionReg", "sessionReg", [
                 { value: "no-self", label: "Do not allow self-registration" },
                 { value: "self", label: "Set to self-registration" },
+              ])}
+            </div>
+          </div>
+
+          <div class="info-banner">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>${STRINGS.infoBannerRegAttendance}</span>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.regAttendance} <span class="req">*</span> <i class="fa-regular fa-circle-question"></i></div>
+            <div class="radio-group">
+              ${renderConfigRadios("regAttendance", "regAttendance", [
+                { value: "single", label: "Register for a single session and attend that session" },
+                { value: "all-all", label: "Register for all sessions and attend all sessions" },
+                { value: "all-one", label: "Register for all sessions and attend at least one session" },
               ])}
             </div>
           </div>
@@ -2318,6 +3137,44 @@
 
     // ==== RENDER: Wizard Modal ====
     function renderWizardModal() {
+      const configuring = state.wizardStep === 2 && state.activeSessionSlotId;
+      const configurePanel = configuring ? renderSessionConfigurePanel() : null;
+
+      if (configurePanel) {
+        const { title, doneDisabled } = configurePanel;
+        return `
+        <div class="overlay" role="dialog" aria-modal="true">
+          <div class="modal modal--wizard">
+            <div class="modal-header modal-header--wizard">
+              <div class="modal-header-session-left">
+                <button type="button" class="modal-header-back" data-action="close-session-configure" aria-label="Back">
+                  <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="modal-header-title">${escapeHtml(title)}</h2>
+              </div>
+              <button type="button" class="modal-close modal-close--neutral" data-action="close-session-configure" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <div class="wizard-body wizard-body--session-configure">
+              <div class="modal-body modal-body--session-configure">
+                <div class="session-configure-content">
+                  ${renderSessionForm({ embedded: true })}
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <span></span>
+              <div class="footer-right">
+                <button type="button" class="btn" data-action="close-session-configure">Cancel</button>
+                <button type="button" class="btn btn-primary" data-action="done-session-configure" ${doneDisabled ? "disabled" : ""}>${STRINGS.sessionsStep.done}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      }
+
       const stepContent = state.wizardStep === 1 ? renderStep1()
         : state.wizardStep === 2 ? renderStep2()
         : renderStep3();
@@ -2411,7 +3268,7 @@
               <h3>Sessions</h3>
               <button type="button" class="btn" data-action="add-sessions-overview">Add Sessions</button>
             </div>
-            <div class="attendance-note">Auto-Attendance Tracking: <strong>${autoTrack}</strong> | <a href="#" data-action="switch-tab" data-tab="settings">Manage in Settings</a></div>
+            <div class="attendance-note">Auto-Attendance Tracking: <strong>${autoTrack}</strong> | <a href="#" data-action="switch-tab" data-tab="settings">View in Settings</a></div>
             ${banner}
             ${sessionCards}
           </div>
@@ -2429,18 +3286,28 @@
       `;
     }
 
+    function renderSettingsConfigField(field) {
+      return `
+        <div class="config-section">
+          <div class="config-section-title">${STRINGS.configLabels[field] || field}</div>
+          <div class="readonly-value">${escapeHtml(configDisplayValue(field, state.config[field]))}</div>
+        </div>
+      `;
+    }
+
     function renderSettingsTab() {
-      const fields = ["learningPaths", "enrollment", "sessionReg", "regAttendance", "autoAttendance", "selfMark"];
       return `
         <div class="settings-readonly">
-          <h3 style="margin:0 0 20px">Event Configuration</h3>
+          <h3 style="margin:0 0 20px">Event configuration</h3>
           <p style="color:var(--muted);margin-bottom:24px;font-size:13px">Settings captured during event creation. Full editors for Completion, Roles, Messages, and Notifications remain on the production Settings tab.</p>
-          ${fields.map((f) => `
-            <div class="config-section">
-              <div class="config-section-title">${STRINGS.configLabels[f] || f}</div>
-              <div class="readonly-value">${escapeHtml(configDisplayValue(f, state.config[f]))}</div>
-            </div>
-          `).join("")}
+          ${renderConfigGroupHeading(STRINGS.configGroups.access)}
+          ${renderSettingsConfigField("learningPaths")}
+          ${renderSettingsConfigField("enrollment")}
+          ${renderConfigGroupHeading(STRINGS.configGroups.registration)}
+          ${renderSettingsConfigField("sessionReg")}
+          ${renderSettingsConfigField("regAttendance")}
+          ${renderSettingsConfigField("autoAttendance")}
+          ${renderSettingsConfigField("selfMark")}
         </div>
       `;
     }
@@ -2598,7 +3465,34 @@
     }
 
     // ==== RENDER: Main ====
+    let preserveWizardScrollOnNextRender = false;
+
+    function getWizardScrollEl() {
+      if (state.modal !== "wizard") return null;
+      return document.querySelector(
+        state.activeSessionSlotId
+          ? ".modal-body--session-configure"
+          : ".wizard-main .modal-body"
+      );
+    }
+
+    function captureWizardScroll() {
+      const el = getWizardScrollEl();
+      return el ? el.scrollTop : null;
+    }
+
+    function restoreWizardScroll(scrollTop) {
+      if (scrollTop == null) return;
+      requestAnimationFrame(() => {
+        const el = getWizardScrollEl();
+        if (el) el.scrollTop = scrollTop;
+      });
+    }
+
     function render() {
+      const scrollTop = preserveWizardScrollOnNextRender ? captureWizardScroll() : null;
+      preserveWizardScrollOnNextRender = false;
+
       const isOverview = state.route === "overview" || location.hash === "#overview";
       const content = isOverview
         ? renderEventPage()
@@ -2611,6 +3505,25 @@
       document.getElementById("app").innerHTML = renderShell(content) + modal;
       bindEvents();
       updateWizardButtons();
+      updateSessionConfigureButtons();
+      restoreWizardScroll(scrollTop);
+      focusSessionTitleIfNeeded();
+    }
+
+    function focusSessionTitleIfNeeded() {
+      if (!state.focusSessionTitleOnRender) return;
+      const inConfigure = !!state.activeSessionSlotId;
+      const inWizardStep2 = state.modal === "wizard" && state.wizardStep === 2;
+      if (!inConfigure && !inWizardStep2) return;
+      state.focusSessionTitleOnRender = false;
+      saveState(state);
+      requestAnimationFrame(() => {
+        const input = document.querySelector('[data-field="sessionForm.title"]');
+        if (input) {
+          input.focus();
+          input.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      });
     }
 
     // ==== HANDLERS ====
@@ -2628,6 +3541,13 @@
       const nextBtn = app.querySelector('[data-action="wizard-next"], [data-action="create-event"]');
       if (state.wizardStep === 1 && nextBtn) nextBtn.disabled = !eventStepValid();
       if (state.wizardStep === 2 && nextBtn) nextBtn.disabled = !sessionsStepValid();
+    }
+
+    function updateSessionConfigureButtons() {
+      if (!state.activeSessionSlotId) return;
+      const app = document.getElementById("app");
+      const doneBtn = app.querySelector('[data-action="done-session-configure"]');
+      if (doneBtn) doneBtn.disabled = !sessionFormValid(state.sessionForm);
     }
 
     function bindEvents() {
@@ -2652,14 +3572,24 @@
           if (path === "sessionForm.type") {
             if (value === "in-person") {
               state.sessionForm.conferenceProvider = "";
-              saveState(state);
+              state.integrationsPanelOpen = false;
+              state.providerPickerExpanded = false;
+            } else if (value === "virtual") {
+              state.sessionForm.location = "";
             }
+            applyConferenceProviderDefaults(state.sessionForm);
+            state.providerPickerExpanded = getLinkedProviders().length !== 1;
+            saveState(state);
+            preserveWizardScrollOnNextRender = true;
             render();
             return;
           }
           if (path === "sessionForm.conferenceProvider") {
             if (state.showSessionFormValidation) render();
-            else updateWizardButtons();
+            else {
+              updateWizardButtons();
+              updateSessionConfigureButtons();
+            }
             return;
           }
           if (path.startsWith("sessionForm.") && state.showSessionFormValidation) {
@@ -2667,6 +3597,7 @@
             return;
           }
           updateWizardButtons();
+          updateSessionConfigureButtons();
         });
       });
 
@@ -2684,6 +3615,17 @@
           reader.readAsDataURL(file);
         });
       }
+
+      app.querySelectorAll('[data-action="select-event-contact"]').forEach((el) => {
+        el.addEventListener("change", () => {
+          const contact = MOCK_CONTACTS.find((c) => c.email === el.value);
+          if (contact) {
+            state.event.contact = contact.name;
+            state.event.contactEmail = contact.email;
+            saveState(state);
+          }
+        });
+      });
     }
 
     function handleAction(action, el, e) {
@@ -2817,11 +3759,23 @@
           saveState(state);
           render();
           updateWizardButtons();
+          updateSessionConfigureButtons();
           break;
         }
 
         case "save-session": {
-          const f = { ...state.sessionForm, id: state.editingSessionId || "s-" + Date.now() };
+          if (state.activeSessionSlotId) {
+            if (!commitSessionForActiveSlot()) {
+              state.showSessionFormValidation = true;
+              saveState(state);
+              render();
+              return;
+            }
+            saveState(state);
+            render();
+            break;
+          }
+          const f = enrichSessionOnSave({ ...state.sessionForm, id: state.editingSessionId || "s-" + Date.now() });
           if (!sessionFormValid(f)) {
             state.showSessionFormValidation = true;
             saveState(state);
@@ -2845,17 +3799,104 @@
           const last = state.sessions[state.sessions.length - 1];
           if (!last) return;
           state.sessionForm = carryForwardSessionForm(last);
+          applyConferenceProviderDefaults(state.sessionForm);
+          state.providerPickerExpanded = getLinkedProviders().length !== 1;
           state.editingSessionId = null;
+          state.focusSessionTitleOnRender = true;
           saveState(state);
           render();
-          requestAnimationFrame(() => {
-            const panel = document.getElementById("session-form-panel");
-            if (panel) panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
-            const titleInput = panel?.querySelector('[data-field="sessionForm.title"]');
-            if (titleInput) titleInput.focus();
-          });
           break;
         }
+
+        case "close-session-configure":
+          closeSessionConfigure();
+          saveState(state);
+          render();
+          break;
+
+        case "done-session-configure":
+          if (!commitSessionForActiveSlot()) {
+            state.showSessionFormValidation = true;
+            saveState(state);
+            render();
+            return;
+          }
+          saveState(state);
+          render();
+          break;
+
+        case "configure-session": {
+          const slotId = el.getAttribute("data-slot-id");
+          loadSessionFormForSlot(slotId);
+          state.activeSessionSlotId = slotId;
+          state.openSlotMenuId = null;
+          state.showSessionFormValidation = false;
+          state.integrationsPanelOpen = false;
+          state.focusSessionTitleOnRender = true;
+          saveState(state);
+          render();
+          break;
+        }
+
+        case "toggle-slot-menu": {
+          const slotId = el.getAttribute("data-slot-id");
+          state.openSlotMenuId = state.openSlotMenuId === slotId ? null : slotId;
+          saveState(state);
+          render();
+          break;
+        }
+
+        case "move-slot-up": {
+          const slotId = el.getAttribute("data-slot-id");
+          const idx = state.sessionSlots.findIndex((s) => s.id === slotId);
+          if (idx > 0) {
+            const slots = state.sessionSlots;
+            [slots[idx - 1], slots[idx]] = [slots[idx], slots[idx - 1]];
+            state.openSlotMenuId = null;
+            saveState(state);
+            render();
+          }
+          break;
+        }
+
+        case "move-slot-down": {
+          const slotId = el.getAttribute("data-slot-id");
+          const idx = state.sessionSlots.findIndex((s) => s.id === slotId);
+          if (idx >= 0 && idx < state.sessionSlots.length - 1) {
+            const slots = state.sessionSlots;
+            [slots[idx], slots[idx + 1]] = [slots[idx + 1], slots[idx]];
+            state.openSlotMenuId = null;
+            saveState(state);
+            render();
+          }
+          break;
+        }
+
+        case "delete-session-slot": {
+          if (state.sessionSlots.length <= 1) return;
+          const slotId = el.getAttribute("data-slot-id");
+          const slot = state.sessionSlots.find((s) => s.id === slotId);
+          if (slot?.sessionId) {
+            state.sessions = state.sessions.filter((s) => s.id !== slot.sessionId);
+            if (state.editingSessionId === slot.sessionId) {
+              state.editingSessionId = null;
+              state.sessionForm = emptySessionForm();
+            }
+          }
+          state.sessionSlots = state.sessionSlots.filter((s) => s.id !== slotId);
+          state.openSlotMenuId = null;
+          if (state.activeSessionSlotId === slotId) state.activeSessionSlotId = null;
+          saveState(state);
+          render();
+          break;
+        }
+
+        case "add-session-slot":
+          state.sessionSlots.push(createSessionSlot(null));
+          state.openSlotMenuId = null;
+          saveState(state);
+          render();
+          break;
 
         case "edit-session": {
           const id = el.getAttribute("data-id");
@@ -2915,6 +3956,43 @@
           render();
           break;
 
+        case "expand-provider-picker":
+          state.providerPickerExpanded = true;
+          saveState(state);
+          render();
+          break;
+
+        case "copy-meeting-link": {
+          const link = el.getAttribute("data-link");
+          if (link && navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(link).then(() => {
+              alert("Meeting link copied to clipboard.");
+            });
+          } else if (link) {
+            alert(`Meeting link: ${link}`);
+          }
+          break;
+        }
+
+        case "select-provider": {
+          const provider = el.getAttribute("data-provider");
+          if (state.integrations[provider]?.linked) {
+            state.sessionForm.conferenceProvider = provider;
+            if (getLinkedProviders().length === 1) {
+              state.providerPickerExpanded = false;
+            }
+            saveState(state);
+            render();
+          }
+          break;
+        }
+
+        case "link-provider-tile":
+          state.integrationsPanelOpen = true;
+          saveState(state);
+          render();
+          break;
+
         case "link-integration": {
           const provider = el.getAttribute("data-provider");
           state.integrations[provider] = {
@@ -2922,7 +4000,10 @@
             email: "david.davidson@highspot.com",
             linkedOn: new Date().toLocaleDateString("en-US"),
           };
+          state.sessionForm.conferenceProvider = provider;
           state.integrationsPanelOpen = true;
+          applyConferenceProviderDefaults(state.sessionForm);
+          state.providerPickerExpanded = getLinkedProviders().length !== 1;
           saveState(state);
           render();
           break;
@@ -2934,6 +4015,8 @@
           if (state.sessionForm.conferenceProvider === provider) {
             state.sessionForm.conferenceProvider = "";
           }
+          applyConferenceProviderDefaults(state.sessionForm);
+          state.providerPickerExpanded = getLinkedProviders().length !== 1;
           saveState(state);
           render();
           break;

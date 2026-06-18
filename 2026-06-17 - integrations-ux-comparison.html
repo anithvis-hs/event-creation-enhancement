@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integrations UX — Comparison Mock</title>
+  <!-- v1: side-by-side mocks of 5 alternatives for session-form video conferencing UX -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+  <style>
+    :root {
+      --primary: #0073bb;
+      --primary-hover: #005a94;
+      --teal: #00838f;
+      --teal-light: #e0f4f6;
+      --surface: #ffffff;
+      --canvas-bg: #eef1f4;
+      --border: #d4dbe3;
+      --text: #1a1a1a;
+      --muted: #5c6570;
+      --radius: 8px;
+      --radius-sm: 4px;
+      --font: "Source Sans Pro", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --shadow: 0 12px 40px rgba(12, 35, 64, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text);
+      background: var(--canvas-bg);
+      line-height: 1.5;
+    }
+
+    .page-header {
+      background: #0c2340;
+      color: #fff;
+      padding: 24px 32px;
+    }
+    .page-header h1 { margin: 0 0 8px; font-size: 20px; }
+    .page-header p { margin: 0; opacity: 0.85; max-width: 720px; font-size: 14px; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .toolbar-label { font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .toolbar button {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .toolbar button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .content { padding: 24px 32px 48px; max-width: 920px; margin: 0 auto; }
+
+    .alt-section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .alt-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #f8fafb;
+    }
+    .alt-header h2 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .alt-badge {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--teal-light);
+      color: var(--teal);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .alt-badge.rec { background: #e8f5e9; color: #2e7d32; }
+    .alt-header p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .alt-body { padding: 20px; }
+
+    .mock-context {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+
+    .session-form-snippet {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: #fafbfc;
+    }
+    .session-form-snippet h4 {
+      margin: 0 0 16px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .req { color: #c62828; }
+    .form-group { margin-bottom: 16px; }
+    .form-select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+    .helper {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .text-link {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      font-family: inherit;
+    }
+    .text-link:hover { text-decoration: underline; }
+
+    /* Provider tiles — Alt 1 */
+    .provider-tiles {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .provider-tile {
+      width: 100px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      background: #fff;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .provider-tile:hover { border-color: var(--primary); }
+    .provider-tile.selected {
+      border-color: var(--teal);
+      background: var(--teal-light);
+    }
+    .provider-tile.unlinked {
+      opacity: 0.65;
+      border-style: dashed;
+    }
+    .provider-tile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .provider-tile-icon.zoom { background: #2d8cff; color: #fff; }
+    .provider-tile-icon.teams { background: #5059c9; color: #fff; }
+    .provider-tile-icon.meet { background: #fff; color: #ea4335; border: 1px solid var(--border); }
+    .provider-tile-name { font-size: 11px; font-weight: 600; }
+    .provider-tile-action {
+      font-size: 10px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Step strip — Alt 5 */
+    .step-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #f0f7fc;
+      border: 1px solid #b8d9f0;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    .step-strip i { color: var(--primary); }
+
+    /* Integrations list (modal / blocked) */
+    .integration-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .integration-row:last-child { border-bottom: none; }
+    .integration-logo {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .integration-logo.zoom { background: #2d8cff; color: #fff; }
+    .integration-logo.teams { background: #5059c9; color: #fff; }
+    .integration-logo.meet { background: #fff; color: #ea4335; border: 1px solid var(--border); }
+    .integration-details { flex: 1; min-width: 0; }
+    .integration-name { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+    .integration-meta { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .link-action {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+    }
+    .btn-link-account {
+      border-radius: var(--radius-sm);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--primary);
+      background: #fff;
+      color: var(--primary);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .empty-block {
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+    .empty-block p { margin: 0 0 12px; color: var(--muted); }
+
+    .first-session-note {
+      background: var(--teal-light);
+      border-left: 3px solid var(--teal);
+      padding: 10px 12px;
+      font-size: 12px;
+      margin-bottom: 16px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .subsequent-form {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border);
+    }
+
+    /* Modal */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 35, 64, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+    }
+    .overlay.hidden { display: none; }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: min(480px, 96vw);
+      max-height: 88vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 { margin: 0; font-size: 16px; font-weight: 600; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+    }
+    .modal-body { padding: 8px 16px 16px; overflow-y: auto; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <h1>Integrations UX — Comparison Mock</h1>
+    <p>Five alternatives for video conferencing in the Add Session form. Use the scenario toggle to compare linked vs unlinked account states. Each section is interactive where noted.</p>
+  </header>
+
+  <div class="toolbar">
+    <span class="toolbar-label">Scenario</span>
+    <button type="button" id="btn-linked" class="active">Some linked (Zoom + Teams)</button>
+    <button type="button" id="btn-none">None linked</button>
+    <button type="button" id="btn-all">All linked</button>
+  </div>
+
+  <main class="content" id="content"></main>
+
+  <div class="overlay hidden" id="manage-modal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Manage video accounts</h3>
+        <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    const PROVIDERS = [
+      { id: "zoom", name: "Zoom", logoClass: "zoom", icon: "fa-solid fa-video" },
+      { id: "teams", name: "Microsoft Teams", logoClass: "teams", icon: "fa-brands fa-microsoft" },
+      { id: "meet", name: "Google Meet", logoClass: "meet", icon: "fa-brands fa-google" },
+    ];
+
+    let scenario = "linked"; // linked | none | all
+    let selectedProvider = "zoom";
+    let modalSource = null;
+
+    function getIntegrations() {
+      if (scenario === "none") {
+        return { zoom: false, teams: false, meet: false };
+      }
+      if (scenario === "all") {
+        return { zoom: true, teams: true, meet: true };
+      }
+      return { zoom: true, teams: true, meet: false };
+    }
+
+    function linkedProviders() {
+      const ints = getIntegrations();
+      return PROVIDERS.filter((p) => ints[p.id]);
+    }
+
+    function renderIntegrationRows(showActions) {
+      const ints = getIntegrations();
+      return PROVIDERS.map((p) => {
+        const linked = ints[p.id];
+        return `
+          <div class="integration-row">
+            <div class="integration-logo ${p.logoClass}"><i class="${p.icon}"></i></div>
+            <div class="integration-details">
+              <div class="integration-name">${p.name}</div>
+              ${linked
+                ? `<div class="integration-meta">Account: david.davidson@highspot.com</div>
+                   <div class="integration-meta">Linked on: 12/23/2025</div>`
+                : `<div class="integration-meta">Not linked</div>`}
+            </div>
+            ${showActions ? (linked
+              ? `<button type="button" class="link-action" data-action="unlink" data-id="${p.id}"><i class="fa-solid fa-link-slash"></i> Unlink</button>`
+              : `<button type="button" class="btn-link-account" data-action="link" data-id="${p.id}">Link Account</button>`) : ""}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function providerTilesHtml() {
+      const ints = getIntegrations();
+      return PROVIDERS.map((p) => {
+        const linked = ints[p.id];
+        const selected = linked && selectedProvider === p.id;
+        return `
+          <div class="provider-tile ${selected ? "selected" : ""} ${linked ? "" : "unlinked"}"
+               data-action="${linked ? "select-provider" : "link-provider"}"
+               data-id="${p.id}"
+               role="button"
+               tabindex="0"
+               aria-pressed="${selected}">
+            <div class="provider-tile-icon ${p.logoClass}"><i class="${p.icon}"></i></div>
+            <div class="provider-tile-name">${p.name}</div>
+            ${linked
+              ? (selected ? '<div class="provider-tile-action"><i class="fa-solid fa-check"></i> Selected</div>' : "")
+              : '<div class="provider-tile-action">Link</div>'}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function dropdownHtml(includeConnect) {
+      const linked = linkedProviders();
+      const options = linked.map((p) =>
+        `<option value="${p.id}" ${selectedProvider === p.id ? "selected" : ""}>${p.name}</option>`
+      ).join("");
+      const connectOpt = includeConnect
+        ? `<option value="__connect__">Connect another account…</option>`
+        : "";
+      return `
+        <select class="form-select" data-action="dropdown-change">
+          <option value="">Select…</option>
+          ${options}
+          ${connectOpt}
+        </select>
+      `;
+    }
+
+    function sessionSnippet(title, inner) {
+      return `
+        <div class="mock-context">${title}</div>
+        <div class="session-form-snippet">
+          <h4><i class="fa-solid fa-plus"></i> Add Session</h4>
+          <div class="form-group">
+            <label class="form-label">Session Type</label>
+            <span style="color:var(--muted);font-size:12px">Virtual (selected)</span>
+          </div>
+          ${inner}
+          <p class="helper">Save your session to automatically generate the video conferencing link.</p>
+        </div>
+      `;
+    }
+
+    function render() {
+      const linked = linkedProviders();
+      const hasAny = linked.length > 0;
+      const hasNone = linked.length === 0;
+
+      document.getElementById("content").innerHTML = `
+        <!-- ALT 1 -->
+        <section class="alt-section" id="alt-1">
+          <div class="alt-header">
+            <h2><span class="alt-badge rec">Recommended</span> Alternative 1 — Visual provider picker</h2>
+            <p>One row of provider tiles. Click to select. Unlinked providers show inline "Link" on the tile. Account details live behind Manage.</p>
+          </div>
+          <div class="alt-body">
+            ${sessionSnippet("Add Session form — conference section", `
+              <div class="form-group">
+                <label class="form-label">Conference provider <span class="req">*</span></label>
+                <div class="provider-tiles">${providerTilesHtml()}</div>
+                <p class="helper" style="margin-top:10px">
+                  <button type="button" class="text-link" data-action="open-modal" data-source="alt1-manage">Manage video accounts</button>
+                  · Accounts can also be linked in Settings
+                </p>
+              </div>
+            `)}
+          </div>
+        </section>
+
+        <!-- ALT 2 -->
+        <section class="alt-section" id="alt-2">
+          <div class="alt-header">
+            <h2><span class="alt-badge">Runner-up</span> Alternative 2 — Dropdown + Connect modal</h2>
+            <p>Familiar select control. "Connect another account…" opens the full integrations list in a modal.</p>
+          </div>
+          <div class="alt-body">
+            ${sessionSnippet("Add Session form", `
+              <div class="form-group">
+                <label class="form-label">Select Conference Provider <span class="req">*</span></label>
+                ${hasNone ? `
+                  <div class="empty-block">
+                    <p>No video accounts connected</p>
+                    <button type="button" class="btn-primary" data-action="open-modal" data-source="alt2-connect">Connect account</button>
+                  </div>
+                ` : dropdownHtml(true)}
+                ${hasAny ? `<p class="helper">You can also manage accounts in <button type="button" class="text-link">Settings</button></p>` : ""}
+              </div>
+            `)}
+          </div>
+        </section>
+
+        <!-- ALT 3 -->
+        <section class="alt-section" id="alt-3">
+          <div class="alt-header">
+            <h2>Alternative 3 — Full list only when blocked</h2>
+            <p>Integrations list appears inline only when no accounts are linked. Once linked, only the provider picker remains.</p>
+          </div>
+          <div class="alt-body">
+            ${sessionSnippet("Add Session form", `
+              <div class="form-group">
+                <label class="form-label">Select Conference Provider <span class="req">*</span></label>
+                ${hasNone ? `
+                  <div style="margin-bottom:12px">
+                    <p class="helper" style="margin-bottom:12px">Connect a video account to continue.</p>
+                    ${renderIntegrationRows(true)}
+                  </div>
+                ` : `
+                  ${dropdownHtml(false)}
+                  <p class="helper" style="margin-top:8px">
+                    Need another provider?
+                    <button type="button" class="text-link" data-action="open-modal" data-source="alt3-connect">Connect account</button>
+                  </p>
+                `}
+              </div>
+            `)}
+          </div>
+        </section>
+
+        <!-- ALT 4 -->
+        <section class="alt-section" id="alt-4">
+          <div class="alt-header">
+            <h2>Alternative 4 — First session only</h2>
+            <p>Account setup UI on the first virtual session; subsequent sessions show a compact picker only.</p>
+          </div>
+          <div class="alt-body">
+            ${sessionSnippet("First session in event", `
+              <div class="first-session-note">
+                <strong>First virtual session</strong> — set up video accounts once for this event.
+              </div>
+              <div class="form-group">
+                <label class="form-label">Select Conference Provider <span class="req">*</span></label>
+                ${hasNone ? renderIntegrationRows(true) : `
+                  <div class="provider-tiles">${providerTilesHtml()}</div>
+                `}
+              </div>
+            `)}
+            <div class="subsequent-form">
+              ${sessionSnippet("Second session (same event)", `
+                <div class="form-group">
+                  <label class="form-label">Select Conference Provider <span class="req">*</span></label>
+                  ${hasAny ? dropdownHtml(false) : `<span class="helper">Provider picker appears after first session setup</span>`}
+                  ${hasAny ? `<p class="helper">Using your connected video accounts · <button type="button" class="text-link" data-action="open-modal" data-source="alt4-manage">Manage</button></p>` : ""}
+                </div>
+              `)}
+            </div>
+          </div>
+        </section>
+
+        <!-- ALT 5 -->
+        <section class="alt-section" id="alt-5">
+          <div class="alt-header">
+            <h2>Alternative 5 — Step 2 ambient strip</h2>
+            <p>Global account status on the Sessions step header. Session form contains only the provider picker.</p>
+          </div>
+          <div class="alt-body">
+            <div class="mock-context">Step 2 — Sessions (above session list & form)</div>
+            <div class="step-strip">
+              <i class="fa-solid fa-video"></i>
+              ${hasAny
+                ? `<span>Video accounts: ${linked.map((p) => p.name).join(", ")} connected</span>
+                   <button type="button" class="text-link" data-action="open-modal" data-source="alt5-manage" style="margin-left:auto">Manage</button>`
+                : `<span>No video accounts connected</span>
+                   <button type="button" class="text-link" data-action="open-modal" data-source="alt5-connect" style="margin-left:auto">Connect account</button>`}
+            </div>
+            ${sessionSnippet("Add Session form (no integrations block)", `
+              <div class="form-group">
+                <label class="form-label">Select Conference Provider <span class="req">*</span></label>
+                ${hasAny ? dropdownHtml(false) : `<span class="helper" style="color:#c62828">Connect an account above to select a provider</span>`}
+              </div>
+            `)}
+          </div>
+        </section>
+      `;
+
+      bindEvents();
+    }
+
+    function openModal(source) {
+      modalSource = source;
+      const titles = {
+        "alt1-manage": "Manage video accounts",
+        "alt2-connect": "Connect video account",
+        "alt3-connect": "Connect another account",
+        "alt4-manage": "Manage video accounts",
+        "alt5-manage": "Manage video accounts",
+        "alt5-connect": "Connect video account",
+      };
+      document.getElementById("modal-title").textContent = titles[source] || "Manage video accounts";
+      document.getElementById("modal-body").innerHTML = renderIntegrationRows(true);
+      document.getElementById("manage-modal").classList.remove("hidden");
+      bindModalEvents();
+    }
+
+    function closeModal() {
+      document.getElementById("manage-modal").classList.add("hidden");
+      modalSource = null;
+    }
+
+    function bindModalEvents() {
+      document.getElementById("modal-body").querySelectorAll("[data-action]").forEach((el) => {
+        el.onclick = (e) => {
+          e.preventDefault();
+          const action = el.getAttribute("data-action");
+          if (action === "link" || action === "unlink") {
+            alert(`Prototype: ${action} ${el.getAttribute("data-id")} (mock only)`);
+          }
+        };
+      });
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("[data-action]").forEach((el) => {
+        el.onclick = (e) => {
+          e.preventDefault();
+          const action = el.getAttribute("data-action");
+          if (action === "open-modal") openModal(el.getAttribute("data-source"));
+          if (action === "select-provider") {
+            selectedProvider = el.getAttribute("data-id");
+            render();
+          }
+          if (action === "link-provider") {
+            openModal("alt1-manage");
+          }
+        };
+      });
+
+      const dropdown = document.querySelector('[data-action="dropdown-change"]');
+      if (dropdown) {
+        dropdown.onchange = () => {
+          if (dropdown.value === "__connect__") {
+            openModal("alt2-connect");
+            dropdown.value = selectedProvider || "";
+          } else {
+            selectedProvider = dropdown.value;
+          }
+        };
+      }
+    }
+
+    document.getElementById("btn-linked").onclick = () => {
+      scenario = "linked";
+      selectedProvider = "zoom";
+      document.querySelectorAll(".toolbar button").forEach((b) => b.classList.remove("active"));
+      document.getElementById("btn-linked").classList.add("active");
+      render();
+    };
+    document.getElementById("btn-none").onclick = () => {
+      scenario = "none";
+      selectedProvider = "";
+      document.querySelectorAll(".toolbar button").forEach((b) => b.classList.remove("active"));
+      document.getElementById("btn-none").classList.add("active");
+      render();
+    };
+    document.getElementById("btn-all").onclick = () => {
+      scenario = "all";
+      selectedProvider = "zoom";
+      document.querySelectorAll(".toolbar button").forEach((b) => b.classList.remove("active"));
+      document.getElementById("btn-all").classList.add("active");
+      render();
+    };
+
+    document.querySelector('[data-action="close-modal"]').onclick = closeModal;
+    document.getElementById("manage-modal").onclick = (e) => {
+      if (e.target.id === "manage-modal") closeModal();
+    };
+
+    render();
+  </script>
+</body>
+</html>
