@@ -275,6 +275,18 @@
       font-size: 12px;
     }
 
+    .home-secondary-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .home-load-sample {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
     /* ========== Modal ========== */
     .overlay {
       position: fixed;
@@ -606,6 +618,25 @@
       font-size: 13px;
       background: #fafbfc;
       margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .banner-upload-placeholder.has-preview {
+      padding: 0;
+      min-height: 120px;
+    }
+
+    .banner-upload-placeholder img,
+    .event-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .event-banner.has-image {
+      background: #e8f4fc;
+      overflow: hidden;
     }
 
     .form-label-row {
@@ -786,6 +817,19 @@
     .session-meta span { display: flex; align-items: center; gap: 6px; }
     .session-meta i { color: var(--primary); width: 14px; }
 
+    .session-provider {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .session-provider .integration-logo {
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      border-radius: 3px;
+    }
+
     .session-card-actions {
       display: flex;
       gap: 8px;
@@ -802,6 +846,24 @@
       background: #fafbfc;
     }
     .empty-sessions i { font-size: 28px; color: var(--primary); margin-bottom: 8px; display: block; }
+
+    .step2-empty-state {
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 16px;
+      background: #fafbfc;
+      font-size: 13px;
+    }
+
+    .step2-empty-state i {
+      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: block;
+    }
 
     .add-another-session {
       margin-top: 12px;
@@ -1090,9 +1152,111 @@
     }
 
     .placeholder-tab {
-      padding: 48px 24px;
-      text-align: center;
+      padding: 24px;
       color: var(--muted);
+    }
+
+    .skeleton-tab {
+      max-width: 960px;
+    }
+
+    .skeleton-tab-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      padding: 10px 12px;
+      background: #fafbfc;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    .skeleton-section {
+      margin-bottom: 24px;
+    }
+
+    .skeleton-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .skeleton-section-header h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .skeleton-toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .skeleton-toolbar .btn:disabled {
+      opacity: 0.55;
+    }
+
+    .skeleton-table {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .skeleton-table-head,
+    .skeleton-table-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 0.8fr;
+      gap: 12px;
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+
+    .skeleton-table-head {
+      background: #f5f7f9;
+      font-weight: 600;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skeleton-table-row {
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skeleton-table-row:last-child {
+      border-bottom: none;
+    }
+
+    .skeleton-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .skeleton-stat-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: #fff;
+    }
+
+    .skeleton-stat-card .label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .skeleton-stat-card .value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
     }
 
     .validation-msg {
@@ -1119,6 +1283,33 @@
       color: var(--muted);
       margin-top: 6px;
       line-height: 1.4;
+    }
+
+    .integrations-settings-note {
+      margin-top: 4px;
+    }
+
+    .integrations-quick-access {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .integrations-quick-text {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .integrations-panel {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .integrations-panel .integration-row:first-child {
+      padding-top: 0;
     }
 
     .integrations-list {
@@ -1232,6 +1423,7 @@
         title: "Consolidated Event Creation",
         desc: "Create an event, sessions, and essential configuration in one guided flow.",
         cta: "Create Event",
+        loadSample: "Load sample event",
         reset: "Reset demo",
       },
       configLabels: {
@@ -1270,6 +1462,15 @@
       { id: "teams", name: "Microsoft Teams", logoClass: "teams", icon: "fa-brands fa-microsoft" },
       { id: "meet", name: "Google Meet", logoClass: "meet", icon: "fa-brands fa-google" },
     ];
+
+    const SAMPLE_BANNER_DATA_URL = "data:image/svg+xml," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="960" height="200">' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0%" stop-color="#0066cc"/><stop offset="100%" stop-color="#00838f"/></linearGradient></defs>' +
+      '<rect width="100%" height="100%" fill="url(#g)"/>' +
+      '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" ' +
+      'font-family="Inter,sans-serif" font-size="22" font-weight="600">Clinical Excellence Summit 2026</text></svg>'
+    );
 
     function defaultIntegrations() {
       return {
@@ -1311,6 +1512,8 @@
         created: false,
         activeTab: "overview",
         showValidation: false,
+        showSessionFormValidation: false,
+        integrationsPanelOpen: false,
         wizardBackdrop: "home",
       };
     }
@@ -1324,6 +1527,8 @@
       state.integrations = defaultIntegrations();
       state.editingSessionId = null;
       state.showValidation = false;
+      state.showSessionFormValidation = false;
+      state.integrationsPanelOpen = false;
       state.created = false;
       state.wizardStep = 1;
     }
@@ -1360,6 +1565,83 @@
         description: "",
         date: addDaysToDateString(savedSession.date, 1),
       };
+    }
+
+    function getSampleEventData() {
+      const today = new Date();
+      const date1 = today.toISOString().slice(0, 10);
+      const date2 = addDaysToDateString(date1, 1);
+      return {
+        event: {
+          title: "Clinical Excellence Summit 2026",
+          description: "Join us for two days of clinical training, best practices, and collaborative learning across virtual sessions.",
+          spot: "Test Design Spot",
+          bannerImage: SAMPLE_BANNER_DATA_URL,
+          contact: "David Davidson",
+          contactEmail: "david.davidson@highspot.com",
+          sessionInstructors: ["David Davidson", "Sarah Chen"],
+        },
+        sessions: [
+          {
+            id: "s-sample-1",
+            title: "Opening Keynote: Patient-Centered Care",
+            description: "Overview of care delivery models and engagement strategies.",
+            instructors: ["David Davidson"],
+            timezone: TIMEZONES[0],
+            date: date1,
+            startTime: "9:00 AM",
+            endTime: "10:30 AM",
+            regMin: "10",
+            regMax: "100",
+            waitlist: true,
+            type: "virtual",
+            conferenceProvider: "zoom",
+          },
+          {
+            id: "s-sample-2",
+            title: "Team Collaboration Workshop",
+            description: "Hands-on session for cross-functional care teams.",
+            instructors: ["Sarah Chen", "David Davidson"],
+            timezone: TIMEZONES[0],
+            date: date2,
+            startTime: "2:00 PM",
+            endTime: "3:30 PM",
+            regMin: "",
+            regMax: "50",
+            waitlist: false,
+            type: "virtual",
+            conferenceProvider: "teams",
+          },
+        ],
+        config: {
+          learningPaths: "yes",
+          enrollment: "invite",
+          sessionReg: "no-self",
+          regAttendance: "single",
+          autoAttendance: "auto",
+          selfMark: false,
+        },
+        integrations: defaultIntegrations(),
+      };
+    }
+
+    function loadSampleEvent() {
+      const sample = getSampleEventData();
+      state.event = { ...sample.event };
+      state.sessions = [...sample.sessions];
+      state.config = { ...sample.config };
+      state.integrations = { ...sample.integrations };
+      state.sessionForm = emptySessionForm();
+      state.editingSessionId = null;
+      state.showValidation = false;
+      state.showSessionFormValidation = false;
+      state.integrationsPanelOpen = false;
+      state.created = true;
+      state.activeTab = "overview";
+      state.modal = null;
+      state.bannerDismissed = { overview: false };
+      saveState(state);
+      navigate("#overview");
     }
 
     function syncSessionFormInstructorsFromEvent() {
@@ -1457,22 +1739,55 @@
 
     function calcDuration(start, end) {
       if (!start || !end) return "";
-      const parse = (t) => {
-        const m = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
-        if (!m) return 0;
-        let h = parseInt(m[1], 10);
-        const min = parseInt(m[2], 10);
-        const pm = m[3].toUpperCase() === "PM";
-        if (pm && h !== 12) h += 12;
-        if (!pm && h === 12) h = 0;
-        return h * 60 + min;
-      };
-      const diff = parse(end) - parse(start);
+      const diff = timeToMinutes(end) - timeToMinutes(start);
       if (diff <= 0) return "";
       if (diff < 60) return diff + " minutes";
       const hrs = Math.floor(diff / 60);
       const mins = diff % 60;
       return mins ? hrs + " hr " + mins + " min" : hrs + " hour" + (hrs > 1 ? "s" : "");
+    }
+
+    function timeToMinutes(t) {
+      const m = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!m) return 0;
+      let h = parseInt(m[1], 10);
+      const min = parseInt(m[2], 10);
+      const pm = m[3].toUpperCase() === "PM";
+      if (pm && h !== 12) h += 12;
+      if (!pm && h === 12) h = 0;
+      return h * 60 + min;
+    }
+
+    function isTimeRangeValid(start, end) {
+      if (!start || !end) return false;
+      return timeToMinutes(end) > timeToMinutes(start);
+    }
+
+    function getTimezoneOffsetLabel(timezone) {
+      const match = (timezone || "").match(/\(GMT[^)]+\)/);
+      return match ? match[0].replace(/[()]/g, "") : "GMT";
+    }
+
+    function formatEventDateRange(sessions) {
+      if (!sessions.length) return "No sessions added yet";
+      if (sessions.length === 1) return formatDate(sessions[0].date);
+      const sorted = [...sessions].sort((a, b) => a.date.localeCompare(b.date));
+      const first = sorted[0].date;
+      const last = sorted[sorted.length - 1].date;
+      if (first === last) return `${formatDate(first)} · ${sessions.length} sessions`;
+      const firstFmt = formatDate(first).replace(/, \d{4}$/, "");
+      return `${firstFmt} – ${formatDate(last)} · ${sessions.length} sessions`;
+    }
+
+    function isBannerDataUrl(value) {
+      return typeof value === "string" && value.startsWith("data:image");
+    }
+
+    function renderBannerPreviewHtml(bannerImage, { alt }) {
+      if (isBannerDataUrl(bannerImage)) {
+        return `<img src="${bannerImage}" alt="${escapeHtml(alt)}" />`;
+      }
+      return bannerImage ? escapeHtml(bannerImage) : "No Image Uploaded";
     }
 
     function needsConferenceProvider(type) {
@@ -1489,13 +1804,27 @@
       return { label: "In Person", icon: "fa-location-dot" };
     }
 
-    function sessionFormValid(form) {
-      const base = form.title.trim() && form.date && form.startTime && form.endTime && form.instructors.length > 0;
-      if (!base) return false;
-      if (needsConferenceProvider(form.type)) {
-        return !!form.conferenceProvider && getLinkedProviders().some((p) => p.id === form.conferenceProvider);
+    function getSessionFormErrors(form) {
+      const errors = {};
+      if (!form.title.trim()) errors.title = "Title is required";
+      if (!form.date) errors.date = "Session date is required";
+      if (!form.startTime) errors.startTime = "Start time is required";
+      if (!form.endTime) errors.endTime = "End time is required";
+      else if (form.startTime && !isTimeRangeValid(form.startTime, form.endTime)) {
+        errors.endTime = "End time must be after start time";
       }
-      return true;
+      if (!form.instructors.length) errors.instructors = "At least one instructor is required";
+      if (needsConferenceProvider(form.type)) {
+        if (!form.conferenceProvider) errors.conferenceProvider = "Select a conference provider";
+        else if (!getLinkedProviders().some((p) => p.id === form.conferenceProvider)) {
+          errors.conferenceProvider = "Selected provider must be linked";
+        }
+      }
+      return errors;
+    }
+
+    function sessionFormValid(form) {
+      return Object.keys(getSessionFormErrors(form)).length === 0;
     }
 
     function eventStepValid() {
@@ -1556,7 +1885,10 @@
               <p class="home-card-desc">${STRINGS.home.desc}</p>
               <div class="home-steps" aria-label="Wizard steps">${steps}</div>
               <button type="button" class="btn btn-primary home-cta" data-action="open-event-wizard">${STRINGS.home.cta}</button>
-              <button type="button" class="link-action home-reset" data-action="reset-demo">${STRINGS.home.reset}</button>
+              <div class="home-secondary-actions">
+                <button type="button" class="link-action home-load-sample" data-action="load-sample-event">${STRINGS.home.loadSample}</button>
+                <button type="button" class="link-action home-reset" data-action="reset-demo">${STRINGS.home.reset}</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1668,7 +2000,8 @@
           </div>
           <div class="form-group">
             <label class="form-label">Event Banner Image</label>
-            <div class="banner-upload-placeholder">${state.event.bannerImage ? escapeHtml(state.event.bannerImage) : "No Image Uploaded"}</div>
+            <div class="banner-upload-placeholder${isBannerDataUrl(state.event.bannerImage) ? " has-preview" : ""}">${renderBannerPreviewHtml(state.event.bannerImage, { alt: "Event banner preview" })}</div>
+            <input type="file" accept="image/*" class="hidden" id="banner-file-input" />
             <button type="button" class="btn" data-action="upload-banner">Upload Image</button>
           </div>
           <div class="form-group">
@@ -1686,6 +2019,22 @@
     function renderSessionCard(session) {
       const duration = calcDuration(session.startTime, session.endTime);
       const { label: typeLabel, icon: typeIcon } = getSessionTypeDisplay(session.type);
+      const tzLabel = getTimezoneOffsetLabel(session.timezone);
+      const providerDef = INTEGRATION_DEFS.find((d) => d.id === session.conferenceProvider);
+      const regParts = [];
+      if (session.regMin) regParts.push(`Min ${session.regMin}`);
+      if (session.regMax) regParts.push(`Max ${session.regMax}`);
+      if (session.waitlist) regParts.push("Waitlist enabled");
+      const regMeta = regParts.length ? regParts.join(" · ") : null;
+      const providerMeta = needsConferenceProvider(session.type) && providerDef ? `
+        <span class="session-provider">
+          <span class="integration-logo ${providerDef.logoClass}">
+            <i class="${providerDef.icon.startsWith("fa-brands") ? providerDef.icon : "fa-solid " + providerDef.icon}"></i>
+          </span>
+          ${escapeHtml(PROVIDER_LABELS[session.conferenceProvider])}
+        </span>
+      ` : "";
+
       return `
         <div class="session-card" data-session-id="${session.id}">
           <div class="session-card-header">
@@ -1699,13 +2048,15 @@
           </div>
           <div class="session-meta">
             <span><i class="fa-regular fa-calendar"></i> ${formatDate(session.date)}</span>
-            <span><i class="fa-regular fa-clock"></i> ${escapeHtml(session.startTime)} GMT+5:30</span>
+            <span><i class="fa-regular fa-clock"></i> ${escapeHtml(session.startTime)} ${escapeHtml(tzLabel)}</span>
             ${duration ? `<span><i class="fa-regular fa-hourglass"></i> ${duration}</span>` : ""}
             <span><i class="fa-solid ${typeIcon}"></i> ${typeLabel}</span>
+            ${providerMeta}
           </div>
           <div class="session-meta">
             <span><i class="fa-regular fa-user"></i> ${escapeHtml(session.instructors.join(", "))}</span>
             <span><i class="fa-solid fa-users"></i> 0 Learners Registered</span>
+            ${regMeta ? `<span><i class="fa-solid fa-ticket"></i> ${escapeHtml(regMeta)}</span>` : ""}
           </div>
           <div class="session-card-actions">
             <button type="button" class="btn btn-primary" style="font-size:12px;padding:6px 12px" data-action="edit-session" data-id="${session.id}">Edit Session</button>
@@ -1715,10 +2066,9 @@
     }
 
     // ==== RENDER: Session form ====
-    function renderIntegrationsList() {
+    function renderIntegrationsPanel() {
       return `
-        <div class="integrations-list">
-          <label class="form-label">Integrations</label>
+        <div class="integrations-panel">
           ${INTEGRATION_DEFS.map((def) => {
             const info = state.integrations[def.id];
             const linked = info?.linked;
@@ -1754,6 +2104,8 @@
     function renderConferenceSection(f) {
       if (!needsConferenceProvider(f.type)) return "";
       const linked = getLinkedProviders();
+      const noneLinked = linked.length === 0;
+      const errors = state.showSessionFormValidation ? getSessionFormErrors(f) : {};
       const options = linked.map((p) =>
         `<option value="${p.id}" ${f.conferenceProvider === p.id ? "selected" : ""}>${escapeHtml(PROVIDER_LABELS[p.id])}</option>`
       ).join("");
@@ -1765,8 +2117,17 @@
             <option value="">Select…</option>
             ${options}
           </select>
+          ${errors.conferenceProvider ? `<div class="validation-msg">${errors.conferenceProvider}</div>` : ""}
           <p class="conference-helper">Save your session to automatically generate the video conferencing link.</p>
-          ${renderIntegrationsList()}
+          <p class="conference-helper integrations-settings-note">Accounts can also be linked in Settings. Link here for quick access.</p>
+          <div class="integrations-quick-access">
+            <span class="integrations-quick-text">
+              ${noneLinked
+                ? 'No accounts linked. <button type="button" class="text-link" data-action="toggle-integrations-panel">Link account</button>'
+                : `${linked.length} account${linked.length > 1 ? "s" : ""} linked. <button type="button" class="text-link" data-action="toggle-integrations-panel">Manage video accounts</button>`}
+            </span>
+          </div>
+          ${state.integrationsPanelOpen ? renderIntegrationsPanel() : ""}
         </div>
       `;
     }
@@ -1774,12 +2135,14 @@
     function renderSessionForm() {
       const f = state.sessionForm;
       const isEdit = state.editingSessionId !== null;
+      const errors = state.showSessionFormValidation ? getSessionFormErrors(f) : {};
       return `
         <div class="session-form-panel" id="session-form-panel">
           <h4><i class="fa-solid fa-${isEdit ? "pen" : "plus"}"></i> ${isEdit ? "Edit Session" : "Add Session"}</h4>
           <div class="form-group">
             <label class="form-label">Title <span class="req">*</span></label>
             <input class="form-input" type="text" data-field="sessionForm.title" value="${escapeHtml(f.title)}" />
+            ${errors.title ? `<div class="validation-msg">${errors.title}</div>` : ""}
           </div>
           <div class="form-group">
             <div class="form-label-row">
@@ -1794,6 +2157,7 @@
           <div class="form-group">
             <label class="form-label">Instructors <span class="req">*</span></label>
             ${renderChipInput(f.instructors, { ariaLabel: "Instructors", removeAction: "remove-instructor" })}
+            ${errors.instructors ? `<div class="validation-msg">${errors.instructors}</div>` : ""}
           </div>
           <div class="form-group">
             <label class="form-label">Timezone</label>
@@ -1804,6 +2168,7 @@
           <div class="form-group">
             <label class="form-label">Session Date <span class="req">*</span></label>
             <input class="form-input" type="date" data-field="sessionForm.date" value="${escapeHtml(f.date)}" />
+            ${errors.date ? `<div class="validation-msg">${errors.date}</div>` : ""}
           </div>
           <div class="form-row form-group">
             <div>
@@ -1812,6 +2177,7 @@
                 <option value="">Select…</option>
                 ${TIME_OPTIONS.map((t) => `<option value="${t}" ${f.startTime === t ? "selected" : ""}>${t}</option>`).join("")}
               </select>
+              ${errors.startTime ? `<div class="validation-msg">${errors.startTime}</div>` : ""}
             </div>
             <div>
               <label class="form-label">End Time <span class="req">*</span></label>
@@ -1819,6 +2185,7 @@
                 <option value="">Select…</option>
                 ${TIME_OPTIONS.map((t) => `<option value="${t}" ${f.endTime === t ? "selected" : ""}>${t}</option>`).join("")}
               </select>
+              ${errors.endTime ? `<div class="validation-msg">${errors.endTime}</div>` : ""}
             </div>
           </div>
           <div class="form-group">
@@ -1849,7 +2216,7 @@
           ${renderConferenceSection(f)}
           <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
             ${isEdit ? '<button type="button" class="btn" data-action="cancel-edit-session">Cancel Edit</button>' : ""}
-            <button type="button" class="btn btn-primary" data-action="save-session" ${sessionFormValid(f) ? "" : "disabled"}>${isEdit ? "Update Session" : "Add Session"}</button>
+            <button type="button" class="btn btn-primary" data-action="save-session">${isEdit ? "Update Session" : "Add Session"}</button>
           </div>
         </div>
       `;
@@ -1859,7 +2226,7 @@
     function renderStep2() {
       const cards = state.sessions.length
         ? `<div class="session-cards">${state.sessions.map(renderSessionCard).join("")}</div>`
-        : "";
+        : `<div class="step2-empty-state"><i class="fa-regular fa-calendar-plus"></i>Add your first session below</div>`;
 
       const addAnotherBtn = `
         <div class="add-another-session">
@@ -2013,9 +2380,9 @@
     }
 
     function renderOverviewTab() {
-      const firstSession = state.sessions[0];
-      const eventDate = firstSession ? formatDate(firstSession.date) : "No sessions added yet";
+      const eventDate = formatEventDateRange(state.sessions);
       const autoTrack = state.config.autoAttendance === "opt-out" ? "Disabled" : "Enabled";
+      const hasBanner = isBannerDataUrl(state.event.bannerImage);
 
       const banner = !state.bannerDismissed.overview ? `
         <div class="info-banner">
@@ -2031,8 +2398,8 @@
 
       return `
         <div class="overview-content">
-          <div class="event-banner"${state.event.bannerImage ? ` style="background:#e8f4fc;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px"` : ""}>
-            ${state.event.bannerImage ? escapeHtml(state.event.bannerImage) : ""}
+          <div class="event-banner${hasBanner ? " has-image" : ""}">
+            ${hasBanner ? `<img class="event-banner-img" src="${state.event.bannerImage}" alt="Event banner" />` : ""}
             <button type="button" class="edit-img" aria-label="Edit image"><i class="fa-regular fa-image"></i></button>
           </div>
           <div class="overview-title-block">
@@ -2078,6 +2445,102 @@
       `;
     }
 
+    function renderPlaceholderSkeleton(title, note, sections) {
+      return `
+        <div class="placeholder-tab skeleton-tab">
+          <p class="skeleton-tab-note">${note}</p>
+          ${sections}
+        </div>
+      `;
+    }
+
+    function renderEnrollmentTab() {
+      return renderPlaceholderSkeleton("Enrollment", STRINGS.placeholderTab, `
+        <div class="skeleton-section">
+          <div class="skeleton-section-header">
+            <h3>Learner Enrollment</h3>
+            <button type="button" class="btn btn-primary" disabled>Enroll Learners</button>
+          </div>
+          <div class="skeleton-toolbar">
+            <button type="button" class="btn" disabled><i class="fa-solid fa-user-plus"></i> Add from Group</button>
+            <button type="button" class="btn" disabled><i class="fa-solid fa-upload"></i> Import CSV</button>
+            <button type="button" class="btn" disabled>Remove Selected</button>
+          </div>
+          <div class="skeleton-table">
+            <div class="skeleton-table-head">
+              <span>Learner</span><span>Status</span><span>Enrolled On</span><span>Actions</span>
+            </div>
+            <div class="skeleton-table-row"><span>—</span><span>—</span><span>—</span><span>—</span></div>
+            <div class="skeleton-table-row"><span>—</span><span>—</span><span>—</span><span>—</span></div>
+          </div>
+        </div>
+      `);
+    }
+
+    function renderRegistrationTab() {
+      return renderPlaceholderSkeleton("Registration & Attendance", STRINGS.placeholderTab, `
+        <div class="skeleton-stat-grid">
+          <div class="skeleton-stat-card"><div class="label">Registered</div><div class="value">0</div></div>
+          <div class="skeleton-stat-card"><div class="label">Attended</div><div class="value">0</div></div>
+          <div class="skeleton-stat-card"><div class="label">Waitlisted</div><div class="value">0</div></div>
+        </div>
+        <div class="skeleton-section">
+          <div class="skeleton-section-header">
+            <h3>Session Registration</h3>
+            <button type="button" class="btn" disabled>Export Report</button>
+          </div>
+          <div class="skeleton-table">
+            <div class="skeleton-table-head">
+              <span>Session</span><span>Registered</span><span>Capacity</span><span>Waitlist</span>
+            </div>
+            ${state.sessions.length
+              ? state.sessions.map((s) => `
+                <div class="skeleton-table-row">
+                  <span>${escapeHtml(s.title)}</span><span>0</span><span>${s.regMax || "—"}</span><span>${s.waitlist ? "On" : "Off"}</span>
+                </div>
+              `).join("")
+              : '<div class="skeleton-table-row"><span>No sessions</span><span>—</span><span>—</span><span>—</span></div>'}
+          </div>
+        </div>
+        <div class="skeleton-section">
+          <div class="skeleton-section-header">
+            <h3>Attendance Tracking</h3>
+            <button type="button" class="btn btn-primary" disabled>Mark Attendance</button>
+          </div>
+          <div class="skeleton-table">
+            <div class="skeleton-table-head">
+              <span>Learner</span><span>Session</span><span>Status</span><span>Marked By</span>
+            </div>
+            <div class="skeleton-table-row"><span>—</span><span>—</span><span>—</span><span>—</span></div>
+          </div>
+        </div>
+      `);
+    }
+
+    function renderReportsTab() {
+      return renderPlaceholderSkeleton("Reports", STRINGS.placeholderTab, `
+        <div class="skeleton-section">
+          <div class="skeleton-section-header">
+            <h3>Event Reports</h3>
+            <button type="button" class="btn btn-primary" disabled>Generate Report</button>
+          </div>
+          <div class="skeleton-toolbar">
+            <button type="button" class="btn" disabled>Enrollment Summary</button>
+            <button type="button" class="btn" disabled>Attendance by Session</button>
+            <button type="button" class="btn" disabled>Completion Status</button>
+          </div>
+          <div class="skeleton-table">
+            <div class="skeleton-table-head">
+              <span>Report</span><span>Last Generated</span><span>Format</span><span>Actions</span>
+            </div>
+            <div class="skeleton-table-row"><span>Enrollment Summary</span><span>—</span><span>CSV</span><span>—</span></div>
+            <div class="skeleton-table-row"><span>Session Attendance</span><span>—</span><span>CSV</span><span>—</span></div>
+            <div class="skeleton-table-row"><span>Event Completion</span><span>—</span><span>PDF</span><span>—</span></div>
+          </div>
+        </div>
+      `);
+    }
+
     function renderEventPage() {
       const tabs = [
         { id: "overview", label: "Overview" },
@@ -2089,6 +2552,9 @@
 
       const tabContent = state.activeTab === "overview" ? renderOverviewTab()
         : state.activeTab === "settings" ? renderSettingsTab()
+        : state.activeTab === "enrollment" ? renderEnrollmentTab()
+        : state.activeTab === "registration" ? renderRegistrationTab()
+        : state.activeTab === "reports" ? renderReportsTab()
         : `<div class="placeholder-tab">${STRINGS.placeholderTab}</div>`;
 
       return `
@@ -2160,12 +2626,8 @@
       const app = document.getElementById("app");
       if (state.modal !== "wizard") return;
       const nextBtn = app.querySelector('[data-action="wizard-next"], [data-action="create-event"]');
-      const saveBtn = app.querySelector('[data-action="save-session"]');
       if (state.wizardStep === 1 && nextBtn) nextBtn.disabled = !eventStepValid();
-      if (state.wizardStep === 2) {
-        if (nextBtn) nextBtn.disabled = !sessionsStepValid();
-        if (saveBtn) saveBtn.disabled = !sessionFormValid(state.sessionForm);
-      }
+      if (state.wizardStep === 2 && nextBtn) nextBtn.disabled = !sessionsStepValid();
     }
 
     function bindEvents() {
@@ -2196,12 +2658,32 @@
             return;
           }
           if (path === "sessionForm.conferenceProvider") {
-            updateWizardButtons();
+            if (state.showSessionFormValidation) render();
+            else updateWizardButtons();
+            return;
+          }
+          if (path.startsWith("sessionForm.") && state.showSessionFormValidation) {
+            render();
             return;
           }
           updateWizardButtons();
         });
       });
+
+      const bannerInput = app.querySelector("#banner-file-input");
+      if (bannerInput) {
+        bannerInput.addEventListener("change", () => {
+          const file = bannerInput.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            state.event.bannerImage = reader.result;
+            saveState(state);
+            render();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
     }
 
     function handleAction(action, el, e) {
@@ -2228,6 +2710,10 @@
           state.wizardBackdrop = "home";
           saveState(state);
           navigate("#create/1");
+          break;
+
+        case "load-sample-event":
+          loadSampleEvent();
           break;
 
         case "reset-demo":
@@ -2279,6 +2765,7 @@
             return;
           }
           state.showValidation = false;
+          state.showSessionFormValidation = false;
           if (state.wizardStep < 3) {
             state.wizardStep++;
             if (state.wizardStep === 2) syncSessionFormInstructorsFromEvent();
@@ -2309,11 +2796,11 @@
           navigate("#overview");
           break;
 
-        case "upload-banner":
-          state.event.bannerImage = "event-banner.jpg";
-          saveState(state);
-          render();
+        case "upload-banner": {
+          const input = document.getElementById("banner-file-input");
+          if (input) input.click();
           break;
+        }
 
         case "remove-event-instructor": {
           const index = parseInt(el.getAttribute("data-index"), 10);
@@ -2335,7 +2822,13 @@
 
         case "save-session": {
           const f = { ...state.sessionForm, id: state.editingSessionId || "s-" + Date.now() };
-          if (!sessionFormValid(f)) return;
+          if (!sessionFormValid(f)) {
+            state.showSessionFormValidation = true;
+            saveState(state);
+            render();
+            return;
+          }
+          state.showSessionFormValidation = false;
           if (state.editingSessionId) {
             state.sessions = state.sessions.map((s) => s.id === state.editingSessionId ? f : s);
             state.editingSessionId = null;
@@ -2370,6 +2863,8 @@
           if (session) {
             state.editingSessionId = id;
             state.sessionForm = { ...session };
+            state.showSessionFormValidation = false;
+            state.integrationsPanelOpen = false;
             saveState(state);
             render();
           }
@@ -2379,6 +2874,7 @@
         case "cancel-edit-session":
           state.editingSessionId = null;
           state.sessionForm = emptySessionForm();
+          state.showSessionFormValidation = false;
           saveState(state);
           render();
           break;
@@ -2413,6 +2909,12 @@
           render();
           break;
 
+        case "toggle-integrations-panel":
+          state.integrationsPanelOpen = !state.integrationsPanelOpen;
+          saveState(state);
+          render();
+          break;
+
         case "link-integration": {
           const provider = el.getAttribute("data-provider");
           state.integrations[provider] = {
@@ -2420,6 +2922,7 @@
             email: "david.davidson@highspot.com",
             linkedOn: new Date().toLocaleDateString("en-US"),
           };
+          state.integrationsPanelOpen = true;
           saveState(state);
           render();
           break;
