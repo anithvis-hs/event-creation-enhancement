@@ -1284,11 +1284,19 @@
       line-height: 1.45;
     }
 
+    .config-section-title:has(+ .toggle-row) {
+      margin-bottom: 8px;
+    }
+
     .toggle-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
+      gap: 12px;
+      padding: 0;
+    }
+
+    .toggle-row .toggle {
+      flex-shrink: 0;
     }
 
     .toggle {
