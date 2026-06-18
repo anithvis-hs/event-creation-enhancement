@@ -2455,20 +2455,6 @@
             </select>
             ${state.showValidation && state.event.title.trim() && !state.event.spot ? '<div class="validation-msg">Spot is required</div>' : ""}
           </div>
-          <div class="info-banner">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>${STRINGS.infoBannerRegAttendance}</span>
-          </div>
-          <div class="config-section">
-            <div class="config-section-title">${STRINGS.configLabels.regAttendance} <span class="req">*</span> <i class="fa-regular fa-circle-question"></i></div>
-            <div class="radio-group">
-              ${renderConfigRadios("regAttendance", "regAttendance", [
-                { value: "single", label: "Register for a single session and attend that session" },
-                { value: "all-all", label: "Register for all sessions and attend all sessions" },
-                { value: "all-one", label: "Register for all sessions and attend at least one session" },
-              ])}
-            </div>
-          </div>
           <div class="form-group">
             <label class="form-label">Event Banner Image</label>
             <div class="banner-upload-placeholder${isBannerDataUrl(state.event.bannerImage) ? " has-preview" : ""}">${renderBannerPreviewHtml(state.event.bannerImage, { alt: "Event banner preview" })}</div>
@@ -2827,16 +2813,6 @@
           <h3>Event Configuration</h3>
 
           <div class="config-section">
-            <div class="config-section-title">${STRINGS.configLabels.learningPaths} <i class="fa-regular fa-circle-question" title="Info"></i></div>
-            <div class="radio-group">
-              ${renderConfigRadios("learningPaths", "learningPaths", [
-                { value: "yes", label: "Yes, this event can be added to learning paths and can have learners enrolled via learning paths" },
-                { value: "no", label: "No, this event cannot be added to learning paths (but will remain in any it was already added to)" },
-              ])}
-            </div>
-          </div>
-
-          <div class="config-section">
             <div class="config-section-title">${STRINGS.configLabels.enrollment} <i class="fa-regular fa-circle-question"></i></div>
             <div class="radio-group">
               ${renderConfigRadios("enrollment", "enrollment", [
@@ -2852,6 +2828,22 @@
               ${renderConfigRadios("sessionReg", "sessionReg", [
                 { value: "no-self", label: "Do not allow self-registration" },
                 { value: "self", label: "Set to self-registration" },
+              ])}
+            </div>
+          </div>
+
+          <div class="info-banner">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>${STRINGS.infoBannerRegAttendance}</span>
+          </div>
+
+          <div class="config-section">
+            <div class="config-section-title">${STRINGS.configLabels.regAttendance} <span class="req">*</span> <i class="fa-regular fa-circle-question"></i></div>
+            <div class="radio-group">
+              ${renderConfigRadios("regAttendance", "regAttendance", [
+                { value: "single", label: "Register for a single session and attend that session" },
+                { value: "all-all", label: "Register for all sessions and attend all sessions" },
+                { value: "all-one", label: "Register for all sessions and attend at least one session" },
               ])}
             </div>
           </div>
@@ -3030,7 +3022,7 @@
     }
 
     function renderSettingsTab() {
-      const fields = ["learningPaths", "enrollment", "sessionReg", "regAttendance", "autoAttendance", "selfMark"];
+      const fields = ["enrollment", "sessionReg", "regAttendance", "autoAttendance", "selfMark"];
       return `
         <div class="settings-readonly">
           <h3 style="margin:0 0 20px">Event Configuration</h3>

@@ -3072,16 +3072,6 @@
           ${renderConfigGroupHeading(STRINGS.configGroups.access)}
 
           <div class="config-section">
-            <div class="config-section-title">${STRINGS.configLabels.learningPaths} <i class="fa-regular fa-circle-question" title="Info"></i></div>
-            <div class="radio-group">
-              ${renderConfigRadios("learningPaths", "learningPaths", [
-                { value: "yes", label: "Yes, this event can be added to learning paths and can have learners enrolled via learning paths" },
-                { value: "no", label: "No, this event cannot be added to learning paths (but will remain in any it was already added to)" },
-              ])}
-            </div>
-          </div>
-
-          <div class="config-section">
             <div class="config-section-title">${STRINGS.configLabels.enrollment} <i class="fa-regular fa-circle-question"></i></div>
             <div class="radio-group">
               ${renderConfigRadios("enrollment", "enrollment", [
@@ -3307,7 +3297,6 @@
           <h3 style="margin:0 0 20px">Event configuration</h3>
           <p style="color:var(--muted);margin-bottom:24px;font-size:13px">Settings captured during event creation. Full editors for Completion, Roles, Messages, and Notifications remain on the production Settings tab.</p>
           ${renderConfigGroupHeading(STRINGS.configGroups.access)}
-          ${renderSettingsConfigField("learningPaths")}
           ${renderSettingsConfigField("enrollment")}
           ${renderConfigGroupHeading(STRINGS.configGroups.registration)}
           ${renderSettingsConfigField("sessionReg")}
