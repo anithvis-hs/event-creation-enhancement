@@ -301,6 +301,38 @@
     }
     .overlay.hidden { display: none; }
 
+    .confirm-overlay { z-index: 60; }
+
+    .modal--confirm {
+      width: min(420px, 92vw);
+      max-height: min(88vh, 360px);
+    }
+
+    .confirm-body {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      padding: 16px;
+    }
+
+    .modal-footer--confirm {
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn-danger {
+      background: var(--surface);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-danger:hover {
+      background: #ffebee;
+    }
+
     .modal {
       background: var(--surface);
       border-radius: var(--radius);
@@ -1937,6 +1969,15 @@
         autoAttendance: "Auto-Attendance Tracking for Virtual Sessions",
         selfMark: "Manage Self-Mark Attendance",
       },
+      confirm: {
+        discardEventTitle: "Discard this event?",
+        discardSessionTitle: "Discard unsaved session changes?",
+        discardSessionBody: "If you leave now, your unsaved session changes will be lost.",
+        discardPromptTitle: "Discard your prompt?",
+        discardPromptBody: "If you leave now, your prompt text will be lost.",
+        keepEditing: "Keep editing",
+        discard: "Discard",
+      },
     };
 
     const TIMEZONES = [
@@ -2029,6 +2070,7 @@
         focusSessionTitleOnRender: false,
         openSlotMenuId: null,
         activeSessionSlotId: null,
+        confirmDialog: null,
       };
     }
 
@@ -2105,7 +2147,131 @@
       state.providerPickerExpanded = false;
     }
 
+    // ==== DISCARD GUARDS ====
+    function getDefaultEvent() {
+      return getDefaultState().event;
+    }
+
+    function getDefaultConfig() {
+      return getDefaultState().config;
+    }
+
+    function arraysEqual(a, b) {
+      return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    function hasEventDetailsProgress() {
+      const def = getDefaultEvent();
+      const e = state.event;
+      if (e.title.trim()) return true;
+      if (e.description.trim()) return true;
+      if (e.spot.trim()) return true;
+      if (e.bannerImage) return true;
+      if (e.contact !== def.contact) return true;
+      if (e.contactEmail !== def.contactEmail) return true;
+      if (!arraysEqual(e.sessionInstructors || [], def.sessionInstructors)) return true;
+      return false;
+    }
+
+    function hasConfigProgress() {
+      return JSON.stringify(state.config) !== JSON.stringify(getDefaultConfig());
+    }
+
+    function hasMeaningfulWizardProgress() {
+      if (state.sessions.length > 0) return true;
+      if (hasEventDetailsProgress()) return true;
+      if (hasConfigProgress()) return true;
+      if (state.wizardStep > 1 && (state.event.title.trim() || state.event.spot.trim())) return true;
+      return false;
+    }
+
+    function shouldConfirmWizardClose() {
+      if (state.created && state.wizardBackdrop === "overview") return false;
+      return hasMeaningfulWizardProgress();
+    }
+
+    function normalizeSessionForm(form) {
+      const { id, ...rest } = form;
+      return JSON.stringify(rest);
+    }
+
+    function getSessionFormBaseline() {
+      if (state.editingSessionId && !state.activeSessionSlotId) {
+        const session = state.sessions.find((s) => s.id === state.editingSessionId);
+        if (session) return normalizeSessionForm(session);
+      }
+      if (state.activeSessionSlotId) {
+        const slotId = state.activeSessionSlotId;
+        const slot = state.sessionSlots.find((s) => s.id === slotId);
+        if (!slot) return normalizeSessionForm(emptySessionForm());
+        if (slot.sessionId) {
+          const session = state.sessions.find((s) => s.id === slot.sessionId);
+          if (session) return normalizeSessionForm(session);
+        }
+        const index = getSlotIndex(slotId);
+        const prior = getLastConfiguredSessionBeforeSlotIndex(index);
+        if (prior) return normalizeSessionForm(carryForwardSessionForm(prior));
+        if (state.event.sessionInstructors?.length) {
+          return normalizeSessionForm({ ...emptySessionForm(), instructors: [...state.event.sessionInstructors] });
+        }
+        return normalizeSessionForm(emptySessionForm());
+      }
+      return normalizeSessionForm(emptySessionForm());
+    }
+
+    function isSessionFormDirty() {
+      syncSessionDateFromDom();
+      return getSessionFormBaseline() !== normalizeSessionForm(state.sessionForm);
+    }
+
+    function getDiscardWizardMessage() {
+      const parts = [];
+      const title = state.event.title.trim();
+      if (title) parts.push(`event "${title}"`);
+      const n = state.sessions.length;
+      if (n) parts.push(`${n} session${n > 1 ? "s" : ""}`);
+      if (parts.length === 0) return "If you leave now, your progress will be lost.";
+      return `You've added ${parts.join(" and ")}. If you leave now, this progress will be lost.`;
+    }
+
+    function openConfirmDialog(type) {
+      state.confirmDialog = { type };
+      saveState(state);
+      render();
+    }
+
+    function performCloseModal({ resetDraft = false } = {}) {
+      state.confirmDialog = null;
+      state.modal = null;
+      state.showValidation = false;
+      if (state.created) {
+        navigate("#overview");
+      } else if (resetDraft) {
+        resetForNewEvent();
+        navigate("#home");
+      } else {
+        navigate("#home");
+      }
+    }
+
+    function performCloseSessionConfigure() {
+      state.confirmDialog = null;
+      closeSessionConfigure();
+      saveState(state);
+      render();
+    }
+
+    function performCancelEditSession() {
+      state.confirmDialog = null;
+      state.editingSessionId = null;
+      state.sessionForm = emptySessionForm();
+      state.showSessionFormValidation = false;
+      saveState(state);
+      render();
+    }
+
     function commitSessionForActiveSlot() {
+      syncSessionDateFromDom();
       const slot = state.sessionSlots.find((s) => s.id === state.activeSessionSlotId);
       const f = enrichSessionOnSave({
         ...state.sessionForm,
@@ -2475,10 +2641,6 @@
       if (y < 1000 || y > 9999) return false;
       const dt = new Date(value + "T12:00:00");
       return dt.getFullYear() === y && dt.getMonth() + 1 === m && dt.getDate() === d;
-    }
-
-    function normalizeSessionDate(value) {
-      return isValidSessionDate(value) ? value : "";
     }
 
     function getSessionFormErrors(form) {
@@ -3508,6 +3670,41 @@
       });
     }
 
+    function renderConfirmDialog() {
+      const type = state.confirmDialog?.type;
+      if (!type) return "";
+
+      let title;
+      let body;
+      let discardAction;
+      if (type === "wizard") {
+        title = STRINGS.confirm.discardEventTitle;
+        body = getDiscardWizardMessage();
+        discardAction = "confirm-discard-wizard";
+      } else if (type === "session-form") {
+        title = STRINGS.confirm.discardSessionTitle;
+        body = STRINGS.confirm.discardSessionBody;
+        discardAction = "confirm-discard-session-form";
+      } else {
+        return "";
+      }
+
+      return `
+        <div class="overlay confirm-overlay" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+          <div class="modal modal--confirm">
+            <div class="modal-header">
+              <h2 class="modal-header-title" id="confirm-title">${escapeHtml(title)}</h2>
+            </div>
+            <div class="modal-body confirm-body">${escapeHtml(body)}</div>
+            <div class="modal-footer modal-footer--confirm">
+              <button type="button" class="btn btn-primary" data-action="dismiss-confirm-dialog">${escapeHtml(STRINGS.confirm.keepEditing)}</button>
+              <button type="button" class="btn btn-danger" data-action="${discardAction}">${escapeHtml(STRINGS.confirm.discard)}</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function render() {
       const scrollTop = preserveWizardScrollOnNextRender ? captureWizardScroll() : null;
       preserveWizardScrollOnNextRender = false;
@@ -3521,7 +3718,8 @@
       if (state.modal === "learning") modal = renderNewLearningModal();
       else if (state.modal === "wizard") modal = renderWizardModal();
 
-      document.getElementById("app").innerHTML = renderShell(content) + modal;
+      document.getElementById("app").innerHTML =
+        renderShell(content) + modal + (state.confirmDialog ? renderConfirmDialog() : "");
       bindEvents();
       updateWizardButtons();
       updateSessionConfigureButtons();
@@ -3554,6 +3752,25 @@
       saveState(state);
     }
 
+    function commitSessionDateFromInput(el) {
+      const raw = el.value.trim();
+      if (raw && isValidSessionDate(raw)) {
+        setField("sessionForm.date", raw);
+        return true;
+      }
+      if (!raw) {
+        setField("sessionForm.date", "");
+        return true;
+      }
+      if (state.sessionForm.date) el.value = state.sessionForm.date;
+      return false;
+    }
+
+    function syncSessionDateFromDom() {
+      const el = document.querySelector('[data-field="sessionForm.date"]');
+      if (el) commitSessionDateFromInput(el);
+    }
+
     function updateWizardButtons() {
       const app = document.getElementById("app");
       if (state.modal !== "wizard") return;
@@ -3580,17 +3797,14 @@
       });
 
       app.querySelectorAll("[data-field]").forEach((el) => {
-        const eventType = el.type === "checkbox" || el.type === "radio" || el.type === "date" ? "change" : "input";
+        if (el.type === "date") return;
+        const eventType = el.type === "checkbox" || el.type === "radio" ? "change" : "input";
         el.addEventListener(eventType, () => {
           const path = el.getAttribute("data-field");
           let value;
           if (el.type === "checkbox") value = el.checked;
           else if (el.type === "radio") { if (!el.checked) return; value = el.value; }
           else value = el.value;
-          if (path === "sessionForm.date") {
-            value = normalizeSessionDate(value);
-            if (value !== el.value) el.value = value;
-          }
           setField(path, value);
           if (path === "sessionForm.type") {
             if (value === "in-person") {
@@ -3623,6 +3837,20 @@
           updateSessionConfigureButtons();
         });
       });
+
+      const dateInput = app.querySelector('[data-field="sessionForm.date"]');
+      if (dateInput) {
+        const afterDateCommit = () => {
+          if (state.showSessionFormValidation) render();
+          else {
+            updateWizardButtons();
+            updateSessionConfigureButtons();
+          }
+        };
+        dateInput.addEventListener("input", () => { commitSessionDateFromInput(dateInput); afterDateCommit(); });
+        dateInput.addEventListener("change", () => { commitSessionDateFromInput(dateInput); afterDateCommit(); });
+        dateInput.addEventListener("blur", () => { commitSessionDateFromInput(dateInput); afterDateCommit(); });
+      }
 
       const bannerInput = app.querySelector("#banner-file-input");
       if (bannerInput) {
@@ -3688,10 +3916,30 @@
           break;
 
         case "close-modal":
-          state.modal = null;
-          state.showValidation = false;
-          if (state.created) navigate("#overview");
-          else navigate("#home");
+          if (state.modal === "wizard") {
+            if (shouldConfirmWizardClose()) {
+              openConfirmDialog("wizard");
+              break;
+            }
+            performCloseModal({ resetDraft: !state.created });
+            break;
+          }
+          performCloseModal();
+          break;
+
+        case "dismiss-confirm-dialog":
+          state.confirmDialog = null;
+          saveState(state);
+          render();
+          break;
+
+        case "confirm-discard-wizard":
+          performCloseModal({ resetDraft: !state.created });
+          break;
+
+        case "confirm-discard-session-form":
+          if (state.activeSessionSlotId) performCloseSessionConfigure();
+          else performCancelEditSession();
           break;
 
         case "select-learning":
@@ -3798,6 +4046,7 @@
             render();
             break;
           }
+          syncSessionDateFromDom();
           const f = enrichSessionOnSave({ ...state.sessionForm, id: state.editingSessionId || "s-" + Date.now() });
           if (!sessionFormValid(f)) {
             state.showSessionFormValidation = true;
@@ -3832,9 +4081,11 @@
         }
 
         case "close-session-configure":
-          closeSessionConfigure();
-          saveState(state);
-          render();
+          if (isSessionFormDirty()) {
+            openConfirmDialog("session-form");
+            break;
+          }
+          performCloseSessionConfigure();
           break;
 
         case "done-session-configure":
@@ -3936,11 +4187,11 @@
         }
 
         case "cancel-edit-session":
-          state.editingSessionId = null;
-          state.sessionForm = emptySessionForm();
-          state.showSessionFormValidation = false;
-          saveState(state);
-          render();
+          if (isSessionFormDirty()) {
+            openConfirmDialog("session-form");
+            break;
+          }
+          performCancelEditSession();
           break;
 
         case "remove-session": {
